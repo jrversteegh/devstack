@@ -23,6 +23,8 @@ curdir=`readlink -f $curdir`
 
 source env.sh
 
+pushd src && ./download && popd || fail "Failed to download some sources" || exit 1
+
 mkdir -p .build
 pushd .build && cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir && make -j 8 && popd || fail "Failed to run cmake" || exit 1
 
