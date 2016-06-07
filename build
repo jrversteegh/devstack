@@ -15,6 +15,7 @@ function test_available()
  
 test_available cmake
 test_available gzip
+test_available bzip2
 test_available xz
 test_available wget
 
