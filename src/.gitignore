@@ -1,5 +1,12 @@
+/.downloads
 /gcc
 /gmp
 /mpc
 /mpfr
-/.downloads
+/Python
+/bzip2
+/expat
+/libffi
+/libpng
+/pcre
+/zlib
