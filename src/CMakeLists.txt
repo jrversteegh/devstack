@@ -103,59 +103,53 @@ ExternalProject_Add(
 )
 
 
-if(0)
 
 # Some libraries first that don't depend on anything else
 
 ExternalProject_Add(
-  lib_z
-  PREFIX ${CMAKE_BINARY_DIR}/zlib/.prefix
+  zlib
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib
   BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
-  lib_bzip2
-  PREFIX ${CMAKE_BINARY_DIR}/bzip2/.prefix
+  bzip2
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bzip2
   BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ""
   # Arcane build procedure for bzip2...
-  BUILD_COMMAND $(MAKE) && $(MAKE) -f Makefile-libbz2_so
-  INSTALL_COMMAND $(MAKE) install PREFIX=${CMAKE_INSTALL_PREFIX} 
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND $(MAKE) -f Makefile-libbz2_so
+  INSTALL_COMMAND $(MAKE) PREFIX=${CMAKE_INSTALL_PREFIX} install && find . -name libbz2.so* -exec mv {} /tmp \;
 )
 
 ExternalProject_Add(
-  lib_pcre
-  PREFIX ${CMAKE_BINARY_DIR}/pcre/.prefix
+  pcre
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pcre
-  BINARY_DIR ${CMAKE_BINARY_DIR}/pcre/.build
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pcre/configure ${PRE_FLAGS} --enable-unicode-properties --enable-jit --enable-pcre16 --enable-pcre32
 )
 
 ExternalProject_Add(
-  lib_ffi
-  PREFIX ${CMAKE_BINARY_DIR}/libffi/.prefix
+  libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libffi
-  BINARY_DIR ${CMAKE_BINARY_DIR}/libffi/.build
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libffi/configure ${PRE_FLAGS} 
-  INSTALL_COMMAND $(MAKE) install
 )
 
 ExternalProject_Add(
-  lib_expat
-  PREFIX ${CMAKE_BINARY_DIR}/expat/.prefix
+  expat
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/expat
-  BINARY_DIR ${CMAKE_BINARY_DIR}/expat/.build
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/expat/configure ${PRE_FLAGS}
 )
 
+ExternalProject_Add(
+  libpng
+  DEPENDS zlib
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libpng
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libpng/configure ${PRE_FLAGS} 
+  BUILD_COMMAND $(MAKE) INCLUDES=-I${CMAKE_INSTALL_PREFIX}/include
+)
+
+if(0)
 ExternalProject_Add(
   open_jpeg
   PREFIX ${CMAKE_BINARY_DIR}/openjpeg/.prefix
@@ -182,15 +176,6 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/sqlite/configure ${PRE_FLAGS} CFLAGS=-DSQLITE_ENABLE_COLUMN_METADATA
 )
 
-ExternalProject_Add(
-  lib_png
-  DEPENDS lib_z
-  PREFIX ${CMAKE_BINARY_DIR}/libpng/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libpng
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libpng/configure ${PRE_FLAGS} 
-  BUILD_COMMAND $(MAKE) INCLUDES=-I${CMAKE_INSTALL_PREFIX}/include
-)
 
 ExternalProject_Add(
   lib_jpeg

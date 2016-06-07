@@ -29,12 +29,12 @@ function gnu_download()
   name=$1
   version=$2
   ext=$3
-  stacked=$4
+  canonical=$4
   file=$name-$version.$ext
   if [ -d $name ]; then
     return 0
   fi
-  if [ $stacked ]; then
+  if [ $canonical ]; then
     url=$GNU_MIRROR/$name/$name-$version/$file
   else
     url=$GNU_MIRROR/$name/$file
@@ -52,5 +52,10 @@ gnu_download mpc 1.0.3 tar.gz
 gnu_download gcc 6.1.0 tar.gz true
 
 download zlib http://zlib.net/zlib-1.2.8.tar.gz
+download bzip2 http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
+download libffi ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz
+download pcre ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
+download expat http://prdownloads.sourceforge.net/expat/expat-2.1.1.tar.bz2
+download libpng http://prdownloads.sourceforge.net/libpng/libpng-1.6.22.tar.xz
 download Python https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz
 
