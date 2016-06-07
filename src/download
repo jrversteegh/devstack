@@ -9,6 +9,21 @@ function fail()
   exit 1
 }
 
+function download() 
+{
+  name=$1
+  url=$2
+  if [ -d $name ]; then
+    return 0
+  fi
+  file=`basename $url`
+  mkdir -p .downloads
+  if [ ! -f .downloads/$file ]; then
+    pushd .downloads && wget $url && popd || fail "Failed to get $name"
+  fi
+  tar xf .downloads/$file && mv $name* $name
+} 
+
 function gnu_download() 
 {
   name=$1
@@ -35,4 +50,7 @@ gnu_download gmp 6.1.0 tar.xz
 gnu_download mpfr 3.1.4 tar.xz 
 gnu_download mpc 1.0.3 tar.gz 
 gnu_download gcc 6.1.0 tar.gz true
+
+download zlib http://zlib.net/zlib-1.2.8.tar.gz
+download Python https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz
 
