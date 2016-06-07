@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function fail()
+{
+  msg=$1
+  echo $msg >&2
+  exit 1
+}
+
+function test_available()
+{
+  prog=$1
+  which $prog >/dev/null || fail "$prog is required for building devstack" || exit 1
+}
+ 
+test_available cmake
+test_available gzip
+test_available xz
+test_available wget
+
+curdir=`dirname $BASH_SOURCE`
+curdir=`readlink -f $curdir`
+
+source env.sh
+
+mkdir -p .build
+pushd .build && cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir && make -j 8 && popd || fail "Failed to run cmake" || exit 1
+
