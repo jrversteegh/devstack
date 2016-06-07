@@ -19,7 +19,7 @@ function gnu_download()
   if [ -d $name ]; then
     return 0
   fi
-  if $stacked; then
+  if [ $stacked ]; then
     url=$GNU_MIRROR/$name/$name-$version/$file
   else
     url=$GNU_MIRROR/$name/$file
