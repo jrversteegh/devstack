@@ -70,7 +70,7 @@ else()
   set(QT_GL_FLAGS "")
 endif()
 
-# First build gcc and boost
+# First build gcc 
 ExternalProject_Add(
   gmp
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gmp
@@ -94,18 +94,16 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
 )
 
-if(0)
 ExternalProject_Add(
-  ex_gcc
-  DEPENDS lib_mpc
-  PREFIX ${CMAKE_BINARY_DIR}/zlib/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib
+  gcc
+  DEPENDS mpc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gcc
   BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --disable-multilib
 )
 
 
+if(0)
 
 # Some libraries first that don't depend on anything else
 
