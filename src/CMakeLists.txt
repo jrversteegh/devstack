@@ -103,11 +103,76 @@ ExternalProject_Add(
 )
 
 
+# Then autotools
+
+ExternalProject_Add(
+  autoconf
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autoconf
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  automake
+  DEPENDS autoconf
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/automake
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  libtool
+  DEPENDS automake
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libtool
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  libunistring
+  DEPENDS libtool
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libunistring
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  libatomic_ops
+  DEPENDS libtool
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libatomic_ops
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  gc
+  DEPENDS libatomic_ops
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gc
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  guile
+  DEPENDS libtool libunistring gc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/guile
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  autogen
+  DEPENDS guile
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autogen
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
 
 # Some libraries first that don't depend on anything else
 
 ExternalProject_Add(
   zlib
+  DEPENDS autogen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -115,28 +180,32 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   bzip2
+  DEPENDS autogen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bzip2
   BUILD_IN_SOURCE 1
   # Arcane build procedure for bzip2...
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND $(MAKE) -f Makefile-libbz2_so
-  INSTALL_COMMAND $(MAKE) PREFIX=${CMAKE_INSTALL_PREFIX} install && find . -name libbz2.so* -exec mv {} /tmp \;
+  BUILD_COMMAND $(MAKE) && $(MAKE) -f Makefile-libbz2_so
+  INSTALL_COMMAND $(MAKE) PREFIX=${CMAKE_INSTALL_PREFIX} install
 )
 
 ExternalProject_Add(
   pcre
+  DEPENDS autogen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pcre
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pcre/configure ${PRE_FLAGS} --enable-unicode-properties --enable-jit --enable-pcre16 --enable-pcre32
 )
 
 ExternalProject_Add(
   libffi
+  DEPENDS autogen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libffi
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libffi/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
   expat
+  DEPENDS autogen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/expat
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/expat/configure ${PRE_FLAGS}
 )
@@ -151,51 +220,15 @@ ExternalProject_Add(
 
 if(0)
 ExternalProject_Add(
-  open_jpeg
-  PREFIX ${CMAKE_BINARY_DIR}/openjpeg/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openjpeg
-  BINARY_DIR ${CMAKE_BINARY_DIR}/openjpeg/.build
-  CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${CMAKE_COMPILERS} .
-)
-
-ExternalProject_Add(
-  lib_jasper
-  PREFIX ${CMAKE_BINARY_DIR}/jasper/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/jasper
-  BINARY_DIR ${CMAKE_BINARY_DIR}/jasper/.build
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND  ${CMAKE_CURRENT_SOURCE_DIR}/jasper/configure ${PRE_FLAGS} --enable-shared=yes 
-)
-
-ExternalProject_Add(
-  sql_lite
-  PREFIX ${CMAKE_BINARY_DIR}/sqlite/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sqlite
-  BINARY_DIR ${CMAKE_BINARY_DIR}/sqlite/.build
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/sqlite/configure ${PRE_FLAGS} CFLAGS=-DSQLITE_ENABLE_COLUMN_METADATA
-)
-
-
-ExternalProject_Add(
-  lib_jpeg
-  PREFIX ${CMAKE_BINARY_DIR}/jpeg/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/jpeg
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/jpeg/configure ${PRE_FLAGS} 
-)
-
-ExternalProject_Add(
-  json_c
-  PREFIX ${CMAKE_BINARY_DIR}/json-c/.prefix
+  json-c
+  DEPENDS autogen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/json-c
-  BINARY_DIR ${CMAKE_BINARY_DIR}/json-c/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/json-c/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
-  lib_icu
-  PREFIX ${CMAKE_BINARY_DIR}/icu/.prefix
+  icu
+  DEPENDS autogen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/icu/source
   BINARY_DIR ${CMAKE_BINARY_DIR}/icu/.build
   CMAKE_COMMAND ""
@@ -203,8 +236,8 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  lib_fam
-  PREFIX ${CMAKE_BINARY_DIR}/fam/.prefix
+  libfam
+  DEPENDS autogen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fam
   BUILD_IN_SOURCE 1
   CMAKE_COMMAND ""
@@ -213,8 +246,8 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  open_ssl
-  DEPENDS lib_z
+  openssl
+  DEPENDS zlib
   PREFIX ${CMAKE_BINARY_DIR}/openssl/.prefix
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
   BUILD_IN_SOURCE 1
@@ -223,10 +256,8 @@ ExternalProject_Add(
   BUILD_COMMAND make
 )
 
-
 ExternalProject_Add(
-  open_blas
-  PREFIX ${CMAKE_BINARY_DIR}/OpenBLAS/.prefix
+  openblas
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/OpenBLAS
   BUILD_IN_SOURCE 1
   CMAKE_COMMAND ""
@@ -235,7 +266,7 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add_Step(
-  open_blas
+  openblas
   after_install
   DEPENDEES install
   COMMAND cd ${CMAKE_INSTALL_PREFIX}/lib && ln -sf libopenblas.so libblas.so && ln -sf libopenblas.so liblapack.so && ln -sf libopenblas.so libatlas.so
@@ -243,8 +274,8 @@ ExternalProject_Add_Step(
 
 # The python interpreter. Get that up soon
 ExternalProject_Add(
-  ex_python
-  DEPENDS lib_ffi open_ssl
+  Python
+  DEPENDS libffi openssl
   PREFIX ${CMAKE_BINARY_DIR}/Python/.prefix
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Python
   BINARY_DIR ${CMAKE_BINARY_DIR}/Python/.build

@@ -9,19 +9,37 @@ function fail()
   exit 1
 }
 
-function download() 
+function patch_package()
 {
   name=$1
-  url=$2
+  if [ -f patches/$name.patch ]; then
+    echo "Patching $name"
+    pushd $name && patch -p0 < ../patches/$name.patch && popd || fail "Failed to patch $name"
+  fi
+}
+
+function download()
+{
+  name=$1
+  file=$2
+  url=$3
   if [ -d $name ]; then
     return 0
   fi
-  file=`basename $url`
   mkdir -p .downloads
   if [ ! -f .downloads/$file ]; then
     pushd .downloads && wget $url && popd || fail "Failed to get $name"
   fi
-  tar xf .downloads/$file && mv $name* $name
+  tar xf .downloads/$file && mv $name-* $name
+  patch_package $name
+}
+
+function url_download() 
+{
+  name=$1
+  url=$2
+  file=`basename $url`
+  download $name $file $url
 } 
 
 function gnu_download() 
@@ -31,31 +49,32 @@ function gnu_download()
   ext=$3
   canonical=$4
   file=$name-$version.$ext
-  if [ -d $name ]; then
-    return 0
-  fi
-  if [ $canonical ]; then
-    url=$GNU_MIRROR/$name/$name-$version/$file
-  else
+  if [ "X$canonical" = "X" ]; then
     url=$GNU_MIRROR/$name/$file
+  else
+    url=$GNU_MIRROR/$name/$canonical/$file
   fi
-  mkdir -p .downloads
-  if [ ! -f .downloads/$file ]; then
-    pushd .downloads && wget $url && popd || fail "Failed to get $name"
-  fi
-  tar xf .downloads/$file && mv $name* $name
+  download $name $file $url
 } 
   
 gnu_download gmp 6.1.0 tar.xz
 gnu_download mpfr 3.1.4 tar.xz 
 gnu_download mpc 1.0.3 tar.gz 
-gnu_download gcc 6.1.0 tar.gz true
+gnu_download gcc 6.1.0 tar.gz gcc-6.1.0
+gnu_download libtool 2.4.6 tar.xz 
+gnu_download libunistring 0.9.6 tar.xz
+url_download libatomic_ops http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.4.2.tar.gz
+url_download gc http://www.hboehm.info/gc/gc_source/gc-7.4.2.tar.gz
+gnu_download guile 2.0.9 tar.xz
+gnu_download autogen 5.18.9 tar.xz rel5.18.9
+gnu_download autoconf 2.69 tar.xz 
+gnu_download automake 1.15 tar.xz
 
-download zlib http://zlib.net/zlib-1.2.8.tar.gz
-download bzip2 http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
-download libffi ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz
-download pcre ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
-download expat http://prdownloads.sourceforge.net/expat/expat-2.1.1.tar.bz2
-download libpng http://prdownloads.sourceforge.net/libpng/libpng-1.6.22.tar.xz
-download Python https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz
+url_download zlib http://zlib.net/zlib-1.2.8.tar.gz
+url_download bzip2 http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
+url_download libffi ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz
+url_download pcre ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
+url_download expat http://prdownloads.sourceforge.net/expat/expat-2.1.1.tar.bz2
+url_download libpng http://prdownloads.sourceforge.net/libpng/libpng-1.6.22.tar.xz
+url_download Python https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz
 
