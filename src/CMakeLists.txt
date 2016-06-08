@@ -181,8 +181,16 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  openssl
+  DEPENDS zlib
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib
+)
+
+ExternalProject_Add(
   bzip2
-  DEPENDS autogen
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bzip2
   BUILD_IN_SOURCE 1
   # Arcane build procedure for bzip2...
@@ -193,87 +201,75 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   pcre
-  DEPENDS autogen
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pcre
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pcre/configure ${PRE_FLAGS} --enable-unicode-properties --enable-jit --enable-pcre16 --enable-pcre32
 )
 
 ExternalProject_Add(
   libffi
-  DEPENDS autogen
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libffi
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libffi/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
   expat
-  DEPENDS autogen
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/expat
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/expat/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   libpng
-  DEPENDS zlib
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libpng
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libpng/configure ${PRE_FLAGS} 
   BUILD_COMMAND $(MAKE) INCLUDES=-I${CMAKE_INSTALL_PREFIX}/include
 )
 
-if(0)
 ExternalProject_Add(
   json-c
-  DEPENDS autogen
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/json-c
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/json-c/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
   icu
-  DEPENDS autogen
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/icu/source
-  BINARY_DIR ${CMAKE_BINARY_DIR}/icu/.build
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/icu/source/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
-  libfam
-  DEPENDS autogen
+  fam
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fam
   BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fam/configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  BUILD_COMMAND ${MAKE}
   INSTALL_COMMAND $(MAKE) install install-data
 )
 
-ExternalProject_Add(
-  openssl
-  DEPENDS zlib
-  PREFIX ${CMAKE_BINARY_DIR}/openssl/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib
-  BUILD_COMMAND make
-)
 
 ExternalProject_Add(
-  openblas
+  OpenBLAS
+  DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/OpenBLAS
   BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ""
-  INSTALL_COMMAND $(MAKE) install PREFIX=${CMAKE_INSTALL_PREFIX}
+  INSTALL_COMMAND $(MAKE) PREFIX=${CMAKE_INSTALL_PREFIX} install 
 )
 
 ExternalProject_Add_Step(
-  openblas
+  OpenBLAS
   after_install
   DEPENDEES install
   COMMAND cd ${CMAKE_INSTALL_PREFIX}/lib && ln -sf libopenblas.so libblas.so && ln -sf libopenblas.so liblapack.so && ln -sf libopenblas.so libatlas.so
 )
 
+if(0)
 # The python interpreter. Get that up soon
 ExternalProject_Add(
   Python

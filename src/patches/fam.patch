@@ -1,0 +1,61 @@
+--- ./include/BTree.h	2003-01-20 05:22:30.000000000 +0100
++++ ./include/BTree.h.patched	2016-06-08 13:42:53.417167411 +0200
+@@ -25,6 +25,10 @@
+ 
+ #include "Boolean.h"
+ 
++#ifndef NULL
++  #define NULL 0
++#endif
++
+ //  This is an in-core B-Tree implementation.
+ //
+ //  The public interface is fairly sparse: find, insert and remove
+--- ./lib/Client.c++	2003-01-18 15:18:12.000000000 +0100
++++ ./lib/Client.c++.patched	2016-06-08 13:42:53.417167411 +0200
+@@ -34,7 +34,7 @@
+ #include <syslog.h>
+ #include <errno.h>
+ 
+-#include <iostream.h>
++#include <iostream>
+ 
+ #include "fam.h"
+ #include "Client.h"
+--- ./src/IMon.c++	2003-01-18 15:18:12.000000000 +0100
++++ ./src/IMon.c++.pathced	2016-06-08 13:42:53.421167410 +0200
+@@ -36,11 +36,11 @@
+ 
+ #include <sys/sysmacros.h>
+ #include <unistd.h>
++#include <stdlib.h>
+ 
+ #include "Interest.h"
+ #include "Log.h"
+ #include "Scheduler.h"
+-#include "alloc.h"
+ 
+ int		   IMon::imonfd = -2;
+ IMon::EventHandler IMon::ehandler = NULL;
+--- ./src/Interest.h	2003-01-18 15:18:12.000000000 +0100
++++ ./src/Interest.h.patched	2016-06-08 13:42:53.421167410 +0200
+@@ -81,7 +81,7 @@
+ protected:
+ 
+     bool do_stat();
+-    virtual void post_event(const Event&, const char * = NULL) = 0;
++    virtual void post_event(const Event&, const char * = 0) = 0;
+     char& ci_bits()			{ return ci_char; }
+     char& dir_bits()			{ return dir_char; }
+     const char& ci_bits() const		{ return ci_char; }
+--- ./src/NFSFileSystem.c++	2003-01-18 15:18:12.000000000 +0100
++++ ./src/NFSFileSystem.c++.patched	2016-06-08 13:42:53.421167410 +0200
+@@ -97,7 +97,7 @@
+ 
+     attr_cache_timeout = ACREGMAX;
+ 
+-    char * p;
++    const char * p;
+         
+     if (strstr(opt, "noac")) {
+         f_noac = true;
