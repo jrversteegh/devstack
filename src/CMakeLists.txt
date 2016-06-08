@@ -325,27 +325,42 @@ ExternalProject_Add(
   INSTALL_COMMAND ./b2 install variant=release link=shared runtime-link=shared threading=multi
 )
 
-if(0)
 ExternalProject_Add(
-  lib_archive
-  DEPENDS lib_xml2 open_ssl
-  PREFIX ${CMAKE_BINARY_DIR}/libarchive/.prefix
+  libarchive
+  DEPENDS libxml2 openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libarchive
-  BINARY_DIR ${CMAKE_BINARY_DIR}/libarchive/.build
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libarchive/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
-  ex_curl
-  DEPENDS lib_archive
-  PREFIX ${CMAKE_BINARY_DIR}/curl/.prefix
+  curl
+  DEPENDS libarchive
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/curl
-  BINARY_DIR ${CMAKE_BINARY_DIR}/curl/.build
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND env LIBS=-lcrypto LDFLAGS=-lssl ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX}
 )
 
+ExternalProject_Add(
+  cmake
+  DEPENDS curl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  bison
+  DEPENDS Python
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bison
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/bison/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  flex
+  DEPENDS bison
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flex
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/flex/configure ${PRE_FLAGS}
+)
+
+if(0)
 ExternalProject_Add(
   setup_tools
   DEPENDS ex_python
