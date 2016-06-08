@@ -18,3 +18,10 @@
 /libatomic_ops/
 /libtool/
 /libunistring/
+/OpenBLAS/
+/fam/
+/icu/
+/json-c/
+/libxml2/
+/libxslt/
+/openssl/

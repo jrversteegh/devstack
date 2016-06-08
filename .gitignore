@@ -1,8 +1,11 @@
 /.build
 /bin
+/etc
 /include
 /lib
 /lib64
 /libexec
-/share
 /man
+/sbin
+/share
+/ssl
