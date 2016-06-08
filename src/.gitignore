@@ -33,3 +33,12 @@
 /cmake
 /bison
 /flex
+/Boost.NumPy/CMakeCache.txt
+/Boost.NumPy/CMakeFiles/
+/cairo/
+/cppunit/
+/gettext/
+/glib/
+/gobject-introspection/
+/pixman/
+/swig/
