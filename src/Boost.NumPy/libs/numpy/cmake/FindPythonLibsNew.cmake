@@ -75,6 +75,7 @@ print(s.get_python_lib(plat_specific=True));
 print(s.get_config_var('SO'));
 print(hasattr(sys, 'gettotalrefcount')+0);
 print(struct.calcsize('@P'));
+print(sys.abiflags);
 "
     RESULT_VARIABLE _PYTHON_SUCCESS
     OUTPUT_VARIABLE _PYTHON_VALUES
@@ -100,6 +101,7 @@ list(GET _PYTHON_VALUES 3 PYTHON_SITE_PACKAGES)
 list(GET _PYTHON_VALUES 4 PYTHON_MODULE_EXTENSION)
 list(GET _PYTHON_VALUES 5 PYTHON_IS_DEBUG)
 list(GET _PYTHON_VALUES 6 PYTHON_SIZEOF_VOID_P)
+list(GET _PYTHON_VALUES 7 PYTHON_ABIFLAGS)
 
 # Make sure the Python has the same pointer-size as the chosen compiler
 if(NOT ${PYTHON_SIZEOF_VOID_P} MATCHES ${CMAKE_SIZEOF_VOID_P})
@@ -144,10 +146,13 @@ else()
     endif()
     # Probably this needs to be more involved. It would be nice if the config
     # information the python interpreter itself gave us were more complete.
-    find_library(PYTHON_LIBRARY
-        NAMES "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
-        PATHS ${_PYTHON_LIBS_SEARCH}
-        NO_SYSTEM_ENVIRONMENT_PATH)
+    # Jaap: doesn't work properly with python in non standard location
+    #find_library(PYTHON_LIBRARY
+    #    NAMES "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
+    #    PATHS ${_PYTHON_LIBS_SEARCH}
+    #    NO_SYSTEM_ENVIRONMENT_PATH)
+    set(PYTHON_LIBRARY
+      "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${PYTHON_ABIFLAGS}.so")
 endif()
 
 # For backward compatibility, set PYTHON_INCLUDE_PATH, but make it internal.
