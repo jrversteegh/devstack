@@ -25,3 +25,6 @@
 /libxml2/
 /libxslt/
 /openssl/
+/boost/
+/openmpi/
+/xz/
