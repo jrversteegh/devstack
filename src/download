@@ -1,7 +1,8 @@
 #!/bin/bash
 
 GNU_MIRROR=http://mirror.inode.at/gnu
-SF_HOST=http://prdownloads.sourceforge.net/
+SF_HOST=http://prdownloads.sourceforge.net
+GNM_HOST=https://download.gnome.org/sources
 
 function fail()
 {
@@ -68,6 +69,16 @@ function sf_download()
   download $name $file $url
 }
   
+function gnm_download() 
+{
+  name=$1
+  version=$2
+  release=$3
+  file=$name-$version.$release.tar.xz
+  url=$GNM_HOST/$name/$version/$file
+  download $name $file $url
+} 
+
 gnu_download gmp 6.1.0 tar.xz
 gnu_download mpfr 3.1.4 tar.xz 
 gnu_download mpc 1.0.3 tar.gz 
@@ -103,5 +114,14 @@ if [ -d boost_1_61_0 ]; then mv boost_* boost; fi
 url_download libarchive http://libarchive.org/downloads/libarchive-3.2.0.tar.gz
 url_download curl https://curl.haxx.se/download/curl-7.49.1.tar.bz2
 url_download cmake https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz
+gnu_download gettext 0.19.7 tar.xz
 gnu_download bison 3.0.4 tar.xz
 sf_download flex 2.6.0 tar.xz
+sf_download cppunit 1.12.1 tar.gz
+sf_download swig 3.0.8 tar.gz
+
+url_download pixman https://www.cairographics.org/releases/pixman-0.34.0.tar.gz
+url_download cairo https://www.cairographics.org/releases/cairo-1.14.6.tar.xz
+
+gnm_download glib 2.49 1 
+gnm_download gobject-introspection 1.48 0 

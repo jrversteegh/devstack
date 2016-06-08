@@ -360,211 +360,37 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/flex/configure ${PRE_FLAGS}
 )
 
-if(0)
+
 ExternalProject_Add(
-  setup_tools
-  DEPENDS ex_python
-  PREFIX ${CMAKE_BINARY_DIR}/setuptools/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/setuptools
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py build
-  INSTALL_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py install
+  swig
+  DEPENDS Python pcre
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/swig
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/swig/configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX}/bin/python
 )
 
 ExternalProject_Add(
-  num_py
-  DEPENDS setup_tools open_blas
-  PREFIX ${CMAKE_BINARY_DIR}/numpy/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/numpy
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND LDFLAGS=-shared ${CMAKE_INSTALL_PREFIX}/bin/${PYTHON} setup.py build
-  INSTALL_COMMAND LDFLAGS=-shared ${CMAKE_INSTALL_PREFIX}/bin/${PYTHON} setup.py install
-)
-
-ExternalProject_Add(
-  i_python
-  DEPENDS ex_python setup_tools
-  PREFIX ${CMAKE_BINARY_DIR}/ipython/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ipython
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/${PYTHON} setup.py build
-  INSTALL_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/${PYTHON} setup.py install
-)
-
-ExternalProject_Add_Step(
-  i_python
-  after_install
-  DEPENDEES install
-  COMMAND cd ${CMAKE_INSTALL_PREFIX}/bin && ln -sf ipython3 ipython
-)
-
-
-ExternalProject_Add(
-  cpp_unit
-  PREFIX ${CMAKE_BINARY_DIR}/cppunit/.prefix
+  cppunit
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cppunit
-  BINARY_DIR ${CMAKE_BINARY_DIR}/cppunit/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cppunit/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
-  lu_sol
-  PREFIX ${CMAKE_BINARY_DIR}/lusol/csrc/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lusol/csrc
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ""
-  INSTALL_COMMAND INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} $(MAKE) install
-)
-
-ExternalProject_Add(
-  col_pack
-  PREFIX ${CMAKE_BINARY_DIR}/ColPack/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ColPack
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --libdir=${CMAKE_INSTALL_PREFIX}/lib
-)
-
-ExternalProject_Add(
-  cx_sparse
-  PREFIX ${CMAKE_BINARY_DIR}/CXSparse/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CXSparse
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ""
-  INSTALL_COMMAND INSTALL_LIB=${CMAKE_INSTALL_PREFIX}/lib INSTALL_INCLUDE=${CMAKE_INSTALL_PREFIX}/include $(MAKE) install
-)
-
-ExternalProject_Add(
-  i_popt
-  DEPENDS open_blas
-  PREFIX ${CMAKE_BINARY_DIR}/Ipopt/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Ipopt
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --enable-static
-)
-
-ExternalProject_Add(
-  adol_c
-  DEPENDS col_pack
-  PREFIX ${CMAKE_BINARY_DIR}/ADOL-C/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ADOL-C
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --libdir=${CMAKE_INSTALL_PREFIX}/lib --with-colpack=${CMAKE_INSTALL_PREFIX} --enable-sparse
-)
-
-ExternalProject_Add(
-  ps_opt
-  DEPENDS lu_sol cx_sparse i_popt adol_c
-  PREFIX ${CMAKE_BINARY_DIR}/Psopt3/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Psopt3
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND IPOPT=${CMAKE_INSTALL_PREFIX} CXSPARSE=${CMAKE_INSTALL_PREFIX} ADOLC=${CMAKE_INSTALL_PREFIX} $(MAKE)
-  INSTALL_COMMAND INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} $(MAKE) install
-)
-
-ExternalProject_Add(
-  geo_s
-  DEPENDS json_c
-  PREFIX ${CMAKE_BINARY_DIR}/geos/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/geos
-  BINARY_DIR ${CMAKE_BINARY_DIR}/geos/.build
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/geos/configure ${PRE_FLAGS} 
-)
-
-ExternalProject_Add(
-  lib_tiff
-  DEPENDS lib_jpeg open_ssl lib_z lib_xz
-  PREFIX ${CMAKE_BINARY_DIR}/tiff/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tiff
-  BINARY_DIR ${CMAKE_BINARY_DIR}/tiff/.build
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tiff/configure ${PRE_FLAGS} 
-)
-
-ExternalProject_Add(
-  ex_gdal
-  DEPENDS num_py open_jp2 open_jpeg lib_png lib_jpeg lib_tiff geo_s lib_pcre ex_curl lib_xml2 lib_expat lib_jasper json_c sql_lite
-  PREFIX ${CMAKE_BINARY_DIR}/gdal/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdal
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX}/bin/${PYTHON} ${OPENCL_FLAGS} --with-openjpeg=${CMAKE_INSTALL_PREFIX} --with-png=${CMAKE_INSTALL_PREFIX} --with-expat=${CMAKE_INSTALL_PREFIX} --with-jasper=${CMAKE_INSTALL_PREFIX} --with-libjson-c=${CMAKE_INSTALL_PREFIX} --with-curl=${CMAKE_INSTALL_PREFIX} --with-geos=yes --with-pcre LDFLAGS=$(LDFLAGS) CPPFLAGS=${CL_INCLUDES} LIBS=${CL_LIBS}
-)
-
-ExternalProject_Add(
-  grib_api
-  DEPENDS open_jpeg num_py 
-  PREFIX ${CMAKE_BINARY_DIR}/grib_api/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/grib_api
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-openjpeg=${CMAKE_INSTALL_PREFIX} --enable-python PYTHON_CONFIG=${CMAKE_INSTALL_PREFIX}/bin/${PYTHON}-config
-)
-
-ExternalProject_Add(
-  nl_opt
-  DEPENDS num_py lib_tiff
-  PREFIX ${CMAKE_BINARY_DIR}/nlopt/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/nlopt
-  BINARY_DIR ${CMAKE_BINARY_DIR}/nlopt/.build
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/nlopt/configure ${PRE_FLAGS} --without-matlab --without-octave PYTHON=${CMAKE_INSTALL_PREFIX}/bin/${PYTHON} PYTHON_CONFIG=${CMAKE_INSTALL_PREFIX}/bin/${PYTHON}-config
-)
-
-
-
-ExternalProject_Add(
-  lib_boost_numpy 
-  DEPENDS ex_boost num_py
-  PREFIX ${CMAKE_BINARY_DIR}/Boost.NumPy/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Boost.NumPy
-  BUILD_IN_SOURCE 1
-  CMAKE_ARGS -D BOOST_ROOT=${CMAKE_INSTALL_PREFIX} -D PYTHON_EXECUTABLE=${CMAKE_INSTALL_PREFIX}/bin/${PYTHON} -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${CMAKE_COMPILERS} .
-)
-
-ExternalProject_Add(
-  ex_swig
-  DEPENDS ex_python lib_pcre
-  PREFIX ${CMAKE_BINARY_DIR}/swig/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/swig
-  BINARY_DIR ${CMAKE_BINARY_DIR}/swig/.build
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/swig/configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX}/bin/${PYTHON}
-)
-
-ExternalProject_Add(
-  pix_man
-  DEPENDS lib_png
-  PREFIX ${CMAKE_BINARY_DIR}/pixman/.prefix
+  pixman
+  DEPENDS libpng
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pixman
-  BINARY_DIR ${CMAKE_BINARY_DIR}/pixman/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pixman/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
-  get_text
-  DEPENDS lib_xml2 lib_bzip2
-  PREFIX ${CMAKE_BINARY_DIR}/gettext/.prefix
+  gettext
+  DEPENDS libxml2 bzip2
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gettext
-  BINARY_DIR ${CMAKE_BINARY_DIR}/gettext/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gettext/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
-  g_lib
-  DEPENDS ex_python lib_fam lib_xslt lib_pcre open_ssl get_text
+  glib
+  DEPENDS Python fam libxslt pcre openssl gettext
   PREFIX ${CMAKE_BINARY_DIR}/glib/.prefix
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glib
   BINARY_DIR ${CMAKE_BINARY_DIR}/glib/.build
@@ -572,13 +398,15 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  gobject_introspection
-  DEPENDS g_lib ex_python
-  PREFIX ${CMAKE_BINARY_DIR}/gobject-introspection/.prefix
+  gobject-introspection
+  DEPENDS glib 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gobject-introspection
-  BINARY_DIR ${CMAKE_BINARY_DIR}/gobject-introspection/.build
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gobject-introspection/configure ${GO_FLAGS} PYTHON=${CMAKE_INSTALL_PREFIX}/bin/${PYTHON}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gobject-introspection/configure ${GO_FLAGS} PYTHON=${CMAKE_INSTALL_PREFIX}/bin/python
 )
+
+if(0)
+
+
 ExternalProject_Add(
   free_type
   DEPENDS gobject_introspection lib_xml2 lib_png lib_tiff
@@ -1129,6 +957,14 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python build.py build_py --use_syswx --no_magic
   INSTALL_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python build.py install_py --use_syswx --no_magic
+)
+
+ExternalProject_Add(
+  Boost.NumPy 
+  DEPENDS boost 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Boost.NumPy
+  BUILD_IN_SOURCE 1
+  CMAKE_ARGS -D BOOST_ROOT=${CMAKE_INSTALL_PREFIX} -D PYTHON_EXECUTABLE=${CMAKE_INSTALL_PREFIX}/bin/python -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${CMAKE_COMPILERS} .
 )
 
 endif(0)
