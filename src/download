@@ -30,7 +30,7 @@ function download()
   if [ ! -f .downloads/$file ]; then
     pushd .downloads && wget $url && popd || fail "Failed to get $name"
   fi
-  tar xf .downloads/$file && mv $name-* $name
+  tar xf .downloads/$file && mv $name-* $name || mv "$name"_* $name || fail "Failed to unpack $name"
   patch_package $name
 }
 
@@ -79,8 +79,13 @@ url_download libpng http://prdownloads.sourceforge.net/libpng/libpng-1.6.22.tar.
 url_download icu http://download.icu-project.org/files/icu4c/57.1/icu4c-57_1-src.tgz
 url_download json-c https://s3.amazonaws.com/json-c_releases/releases/json-c-0.12.1.tar.gz
 url_download OpenBLAS http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz
-url_download fam ftp://oss.sgi.com/projects/fam/download/stable/fam-2.7.0.tar.gz && chmod -R u+w fam
+url_download fam ftp://oss.sgi.com/projects/fam/download/stable/fam-2.7.0.tar.gz 
+chmod -R u+w fam
 url_download openssl https://www.openssl.org/source/openssl-1.0.2h.tar.gz
 url_download Python https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz
+url_download xz http://tukaani.org/xz/xz-5.2.2.tar.xz
 url_download libxml2 ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz
 url_download libxslt ftp://xmlsoft.org/libxml2/libxslt-1.1.29.tar.gz
+url_download openmpi https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.bz2
+url_download boost http://prdownloads.sourceforge.net/boost/boost_1_61_0.tar.bz2  
+if [ -d boost_1_61_0 ]; then mv boost_* boost; fi

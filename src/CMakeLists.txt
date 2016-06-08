@@ -269,46 +269,63 @@ ExternalProject_Add_Step(
   COMMAND cd ${CMAKE_INSTALL_PREFIX}/lib && ln -sf libopenblas.so libblas.so && ln -sf libopenblas.so liblapack.so && ln -sf libopenblas.so libatlas.so
 )
 
-if(0)
 # The python interpreter. Get that up soon
 ExternalProject_Add(
   Python
   DEPENDS libffi openssl
-  PREFIX ${CMAKE_BINARY_DIR}/Python/.prefix
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Python
-  BINARY_DIR ${CMAKE_BINARY_DIR}/Python/.build
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared --with-ensurepip
 )
+
 ExternalProject_Add_Step(
-  ex_python
+  Python
   after_install
   DEPENDEES install
-  COMMAND cd ${CMAKE_INSTALL_PREFIX}/bin && ln -sf python${PYVERSION} python && ln -sf python${PYVERSION}-config python-config
+  COMMAND cd ${CMAKE_INSTALL_PREFIX}/bin && ln -sf python3 python && ln -sf python3-config python-config && ln -sf pip3 pip
 )
 
 ExternalProject_Add(
-  lib_xz
-  # Dependencies just to force build order
-  DEPENDS lib_z lib_bzip2 ex_python
-  PREFIX ${CMAKE_BINARY_DIR}/xz/.prefix
+  xz
+  DEPENDS Python
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/xz
-  BINARY_DIR ${CMAKE_BINARY_DIR}/xz/.build
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/xz/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
-  lib_xml2
-  DEPENDS lib_xz lib_icu
-  PREFIX ${CMAKE_BINARY_DIR}/libxml2/.prefix
+  libxml2
+  DEPENDS xz icu
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libxml2
-  BINARY_DIR ${CMAKE_BINARY_DIR}/libxml2/.build
-  CMAKE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libxml2/configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX} --with-icu --with-xpath LDFLAGS=$(LDFLAGS)
   INSTALL_COMMAND $(MAKE) install
 )
 
+ExternalProject_Add(
+  libxslt
+  DEPENDS libxml2
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libxslt
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libxslt/configure ${PRE_FLAGS}
+  INSTALL_COMMAND $(MAKE) install 
+)
+
+ExternalProject_Add(
+  openmpi
+  DEPENDS Python
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openmpi
+  # Disable vt because of compile error in combination with cuda
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openmpi/configure ${PRE_FLAGS} --enable-cxx-exceptions --disable-vt
+)
+
+ExternalProject_Add(
+  boost
+  DEPENDS openmpi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/boost
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./bootstrap.sh ${PRE_FLAGS} --with-icu=${CMAKE_INSTALL_PREFIX}
+  BUILD_COMMAND ./b2 variant=release link=shared runtime-link=shared threading=multi
+  INSTALL_COMMAND ./b2 install variant=release link=shared runtime-link=shared threading=multi
+)
+
+if(0)
 ExternalProject_Add(
   lib_archive
   DEPENDS lib_xml2 open_ssl
@@ -327,39 +344,6 @@ ExternalProject_Add(
   BINARY_DIR ${CMAKE_BINARY_DIR}/curl/.build
   CMAKE_COMMAND ""
   CONFIGURE_COMMAND env LIBS=-lcrypto LDFLAGS=-lssl ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX}
-)
-
-ExternalProject_Add(
-  lib_xslt
-  DEPENDS ex_python lib_xml2
-  PREFIX ${CMAKE_BINARY_DIR}/libxslt/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libxslt
-  BINARY_DIR ${CMAKE_BINARY_DIR}/libxslt/.build
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libxslt/configure ${PRE_FLAGS}
-  INSTALL_COMMAND $(MAKE) install 
-)
-
-ExternalProject_Add(
-  open_mpi
-  PREFIX ${CMAKE_BINARY_DIR}/openmpi/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openmpi
-  BINARY_DIR ${CMAKE_BINARY_DIR}/openmpi/.build
-  CMAKE_COMMAND ""
-  # Disable vt because of compile error in combination with cuda
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openmpi/configure ${PRE_FLAGS} --enable-cxx-exceptions --disable-vt
-)
-
-ExternalProject_Add(
-  ex_boost
-  DEPENDS ex_python open_mpi lib_archive lib_icu open_ssl
-  PREFIX ${CMAKE_BINARY_DIR}/boost/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/boost
-  BUILD_IN_SOURCE 1
-  CMAKE_COMMAND ""
-  CONFIGURE_COMMAND ./bootstrap.sh ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX}/bin/python --with-icu=${CMAKE_INSTALL_PREFIX}
-  BUILD_COMMAND ./b2 -q stage variant=release link=shared runtime-link=shared threading=multi cxxflags=$(CXXFLAGS) cflags=$(CFLAGS) linkflags=$(LDFLAGS)
-  INSTALL_COMMAND ./b2 -q install variant=release link=shared runtime-link=shared threading=multi cxxflags=$(CXXFLAGS) cflags=$(CFLAGS) linkflags=$(LDFLAGS)
 )
 
 ExternalProject_Add(

@@ -21,6 +21,7 @@ test_available wget
 
 curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
+cd $curdir
 
 source env.sh
 
