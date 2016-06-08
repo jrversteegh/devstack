@@ -10,3 +10,11 @@
 /libpng
 /pcre
 /zlib
+/autoconf/
+/autogen/
+/automake/
+/gc/
+/guile/
+/libatomic_ops/
+/libtool/
+/libunistring/
