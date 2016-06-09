@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 
-# Use gnu compilers found on the path
-execute_process(COMMAND which gcc OUTPUT_VARIABLE CMAKE_C_COMPILER)
-execute_process(COMMAND which g++ OUTPUT_VARIABLE CMAKE_CXX_COMPILER)
-string(STRIP ${CMAKE_C_COMPILER} CMAKE_C_COMPILER)
-string(STRIP ${CMAKE_CXX_COMPILER} CMAKE_CXX_COMPILER)
-
 # Create external projects for contributions
 include(ExternalProject)
 include(CheckIncludeFiles)
@@ -106,8 +100,16 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  gdb
+  texinfo
   DEPENDS gcc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/texinfo
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  gdb
+  DEPENDS texinfo
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdb
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -196,6 +198,7 @@ ExternalProject_Add(
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib
+  BUILD_COMMAND $(MAKE) depend && $(MAKE)
 )
 
 ExternalProject_Add(
@@ -362,7 +365,7 @@ ExternalProject_Add(
   curl
   DEPENDS libarchive
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/curl
-  CONFIGURE_COMMAND env LIBS=-lcrypto LDFLAGS=-lssl ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(
@@ -396,6 +399,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   cppunit
+  DEPENDS Python
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cppunit
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cppunit/configure ${PRE_FLAGS} 
 )
@@ -489,7 +493,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   python_modules
-  DEPENDS gtk+
+  DEPENDS Python gtk+
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/python_modules
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
