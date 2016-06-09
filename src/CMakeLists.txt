@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
+# Set compilers to gcc and g++ rather than cc and c++
+set(CMAKE_C_COMPILER gcc)
+set(CMAKE_CXX_COMPILER g++)
 # Create external projects for contributions
 include(ExternalProject)
 include(CheckIncludeFiles)
