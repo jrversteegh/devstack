@@ -29,3 +29,5 @@ libs/numpy/test/CMakeFiles/
 libs/numpy/test/CTestTestfile.cmake
 libs/numpy/test/Makefile
 libs/numpy/test/cmake_install.cmake
+install_manifest.txt
+

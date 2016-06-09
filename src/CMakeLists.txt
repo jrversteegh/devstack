@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 
-# Set compilers to gcc and g++ rather than cc and c++
-set(CMAKE_C_COMPILER gcc)
-set(CMAKE_CXX_COMPILER g++)
 # Create external projects for contributions
 include(ExternalProject)
 include(CheckIncludeFiles)
@@ -14,6 +11,7 @@ set(GNU_MIRROR http://mirror.inode.at/gnu/)
 set(BOOST_CFLAGS -I${CMAKE_INSTALL_PREFIX}/include)
 set(BOOST_CXXFLAGS -I${CMAKE_INSTALL_PREFIX}/include)
 set(BOOST_LDFLAGS -L${CMAKE_INSTALL_PREFIX}/lib)
+set(CMAKE_COMPILERS -D CMAKE_C_COMPILER=gcc -D CMAKE_CXX_COMPILER=g++)
 
 check_include_files(CL/opencl.h HAVE_OPENCL_INC)
 check_include_files(GL/gl.h HAVE_OPENGL_INC)
