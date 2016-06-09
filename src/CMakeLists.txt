@@ -167,27 +167,12 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
 )
 
-ExternalProject_Add(
-  guile
-  DEPENDS libtool libunistring gc
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/guile
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
-)
-
-ExternalProject_Add(
-  autogen
-  DEPENDS guile
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autogen
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
-)
 
 # Some libraries first that don't depend on anything else
 
 ExternalProject_Add(
   zlib
-  DEPENDS autogen
+  DEPENDS gc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -225,6 +210,22 @@ ExternalProject_Add(
   DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libffi
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libffi/configure ${PRE_FLAGS} 
+)
+
+ExternalProject_Add(
+  guile
+  DEPENDS libtool libunistring gc libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/guile
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  autogen
+  DEPENDS guile
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autogen
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
