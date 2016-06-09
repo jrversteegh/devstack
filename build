@@ -10,7 +10,7 @@ function fail()
 function test_available()
 {
   prog=$1
-  which $prog >/dev/null || fail "$prog is required for building devstack" || exit 1
+  which $prog >/dev/null || fail "$prog is required for building devstack"
 }
  
 test_available cmake
@@ -25,8 +25,13 @@ cd $curdir
 
 source env.sh
 
-pushd src && ./download && popd || fail "Failed to download some sources" || exit 1
+pushd src 
+./download || fail "Failed to download some sources"
+popd
 
 mkdir -p .build
-pushd .build && cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir && make -j 8 && popd || fail "Failed to run cmake" || exit 1
-
+pushd .build 
+cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake"
+make -j 8 || make -j 8 || fail "Failed to complete make"
+popd
+echo "Done!"
