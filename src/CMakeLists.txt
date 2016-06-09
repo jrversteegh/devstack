@@ -105,6 +105,13 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --disable-multilib --enable-ld --enable-gold --enable-lto
 )
 
+ExternalProject_Add(
+  gdb
+  DEPENDS gcc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdb
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
 
 # Then autotools
 
