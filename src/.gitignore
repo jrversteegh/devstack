@@ -42,3 +42,14 @@
 /gobject-introspection/
 /pixman/
 /swig/
+/atk/
+/fontconfig/
+/freetype/
+/gdk-pixbuf/
+/gtk+/
+/harfbuzz/
+/jpeg/
+/pango/
+/pygobject/
+/tiff/
+

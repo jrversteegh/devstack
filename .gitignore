@@ -4,9 +4,9 @@
 /etc
 /include
 /lib
-/lib64
 /libexec
 /man
 /sbin
 /share
 /ssl
+/var
