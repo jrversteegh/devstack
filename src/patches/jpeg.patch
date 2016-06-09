@@ -1,0 +1,12 @@
+--- config.sub	1998-03-25 16:25:39.000000000 +0100
++++ config.sub.patched	2016-06-09 12:45:49.857462405 +0200
+@@ -165,6 +165,9 @@
+ 	i[3456]86)
+ 	  basic_machine=$basic_machine-pc
+ 	  ;;
++	x86_64-unknown)
++	  basic_machine=$basic_machine
++	  ;;
+ 	# Object if more than one company name word.
+ 	*-*-*)
+ 		echo Invalid configuration \`$1\': machine \`$basic_machine\' not recognized 1>&2
