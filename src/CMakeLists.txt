@@ -102,7 +102,7 @@ ExternalProject_Add(
   DEPENDS mpc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gcc
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --disable-multilib
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --disable-multilib --enable-ld --enable-gold --enable-lto
 )
 
 
