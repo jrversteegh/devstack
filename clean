@@ -5,6 +5,7 @@ curdir=`readlink -f $curdir`
 cd $curdir
 
 rm -rf bin
+rm -rf doc
 rm -rf etc
 rm -rf include
 rm -rf lib

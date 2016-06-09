@@ -48,7 +48,6 @@ rm -rf OpenBLAS
 rm -rf openmpi
 rm -rf openssl
 rm -rf pango
-rm -rf patches
 rm -rf pcre
 rm -rf pixman
 rm -rf pygobject
