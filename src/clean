@@ -1,0 +1,60 @@
+#!/bin/bash
+
+curdir=`dirname $BASH_SOURCE`
+curdir=`readlink -f $curdir`
+cd $curdir
+
+rm -rf atk
+rm -rf autoconf
+rm -rf autogen
+rm -rf automake
+rm -rf bison
+rm -rf boost
+rm -rf bzip2
+rm -rf cairo
+rm -rf cmake
+rm -rf cppunit
+rm -rf curl
+rm -rf expat
+rm -rf fam
+rm -rf flex
+rm -rf fontconfig
+rm -rf freetype
+rm -rf gc
+rm -rf gcc
+rm -rf gdb
+rm -rf gdk-pixbuf
+rm -rf gettext
+rm -rf glib
+rm -rf gmp
+rm -rf gobject-introspection
+rm -rf gtk+
+rm -rf guile
+rm -rf harfbuzz
+rm -rf icu
+rm -rf jpeg
+rm -rf json-c
+rm -rf libarchive
+rm -rf libatomic_ops
+rm -rf libffi
+rm -rf libpng
+rm -rf libtool
+rm -rf libunistring
+rm -rf libxml2
+rm -rf libxslt
+rm -rf mpc
+rm -rf mpfr
+rm -rf OpenBLAS
+rm -rf openmpi
+rm -rf openssl
+rm -rf pango
+rm -rf patches
+rm -rf pcre
+rm -rf pixman
+rm -rf pygobject
+rm -rf Python
+rm -rf swig
+rm -rf texinfo
+rm -rf tiff
+rm -rf xz
+rm -rf zlib

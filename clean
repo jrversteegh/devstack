@@ -1,14 +1,20 @@
 #!/bin/bash
 
+curdir=`dirname $BASH_SOURCE`
+curdir=`readlink -f $curdir`
+cd $curdir
+
 rm -rf bin
 rm -rf etc
 rm -rf include
 rm -rf lib
-rm -rf lib64
 rm -rf libexec
 rm -rf man
 rm -rf sbin
 rm -rf share
 rm -rf ssl
+rm -rf var
 
 rm -rf .build
+
+src/clean
