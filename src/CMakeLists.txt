@@ -229,6 +229,14 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  jpeg
+  DEPENDS openssl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/jpeg
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --enable-shared
+)
+
+ExternalProject_Add(
   json-c
   DEPENDS openssl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/json-c
@@ -289,6 +297,13 @@ ExternalProject_Add(
   DEPENDS Python
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/xz
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/xz/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  tiff
+  DEPENDS xz
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tiff
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tiff/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
@@ -391,9 +406,7 @@ ExternalProject_Add(
 ExternalProject_Add(
   glib
   DEPENDS Python fam libxslt pcre openssl gettext
-  PREFIX ${CMAKE_BINARY_DIR}/glib/.prefix
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glib
-  BINARY_DIR ${CMAKE_BINARY_DIR}/glib/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glib/configure ${GO_FLAGS} --disable-selinux --with-pcre=system 
 )
 
@@ -404,75 +417,52 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gobject-introspection/configure ${GO_FLAGS} PYTHON=${CMAKE_INSTALL_PREFIX}/bin/python
 )
 
-if(0)
-
-
 ExternalProject_Add(
-  free_type
-  DEPENDS gobject_introspection lib_xml2 lib_png lib_tiff
-  PREFIX ${CMAKE_BINARY_DIR}/freetype/.prefix
+  freetype
+  DEPENDS gobject-introspection libxml2 libpng tiff
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/freetype
-  BINARY_DIR ${CMAKE_BINARY_DIR}/freetype/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/freetype/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
-  font_config
-  DEPENDS lib_xml2 free_type
-  PREFIX ${CMAKE_BINARY_DIR}/fontconfig/.prefix
+  fontconfig
+  DEPENDS freetype
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig
-  BINARY_DIR ${CMAKE_BINARY_DIR}/fontconfig/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig/configure ${PRE_FLAGS} --enable-libxml2 --disable-docs
 )
 
 ExternalProject_Add(
-  lib_cairo
-  DEPENDS pix_man gobject_introspection free_type lib_png font_config lib_tiff
-  PREFIX ${CMAKE_BINARY_DIR}/cairo/.prefix
+  cairo
+  DEPENDS pixman gobject-introspection fontconfig
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cairo
-  BINARY_DIR ${CMAKE_BINARY_DIR}/cairo/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cairo/configure ${PRE_FLAGS} --enable-ft=yes --enable-fc=yes ${CAIRO_GL_FLAGS} --disable-static
 )
 
 ExternalProject_Add(
-  a_tk
-  DEPENDS gobject_introspection
-  PREFIX ${CMAKE_BINARY_DIR}/atk/.prefix
+  atk
+  DEPENDS gobject-introspection
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/atk
-  BINARY_DIR ${CMAKE_BINARY_DIR}/atk/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/atk/configure ${GO_FLAGS}
 )
 
 ExternalProject_Add(
-  ex_ragel
-  PREFIX ${CMAKE_BINARY_DIR}/ragel/.prefix
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ragel
-  BINARY_DIR ${CMAKE_BINARY_DIR}/ragel/.build
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ragel/configure ${PRE_FLAGS}
-)
-
-ExternalProject_Add(
-  harf_buzz
-  DEPENDS ex_ragel free_type
-  PREFIX ${CMAKE_BINARY_DIR}/harfbuzz/.prefix
+  harfbuzz
+  DEPENDS freetype gobject-introspection
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/harfbuzz
-  BINARY_DIR ${CMAKE_BINARY_DIR}/harfbuzz/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/harfbuzz/configure ${PRE_FLAGS} --with-gobject
 )
 
 
 ExternalProject_Add(
-  pan_go
-  DEPENDS lib_cairo gobject_introspection harf_buzz
-  PREFIX ${CMAKE_BINARY_DIR}/pango/.prefix
+  pango
+  DEPENDS cairo harfbuzz
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pango
-  BINARY_DIR ${CMAKE_BINARY_DIR}/pango/.build
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pango/configure ${GO_FLAGS}
 )
 
 ExternalProject_Add(
-  gdk_pixbuf 
-  DEPENDS gobject_introspection lib_png lib_jpeg
+  gdk-pixbuf 
+  DEPENDS gobject-introspection libpng jpeg
   PREFIX ${CMAKE_BINARY_DIR}/gdk-pixbuf/.prefix
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdk-pixbuf
   # Problems building out of source
@@ -481,13 +471,13 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  gtkp
-  DEPENDS gobject_introspection lib_cairo pan_go a_tk gdk_pixbuf
-  PREFIX ${CMAKE_BINARY_DIR}/gtk+/.prefix
+  gtk+
+  DEPENDS gobject-introspection cairo pango atk gdk-pixbuf
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gtk+
-  BINARY_DIR ${CMAKE_BINARY_DIR}/gtk+/.build
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gtk+/configure ${GO_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gtk+/configure ${GO_FLAGS} --without-atk-bridge
 )
+
+if(0)
 
 ExternalProject_Add(
   lib_cogl

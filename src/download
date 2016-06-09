@@ -3,6 +3,7 @@
 GNU_MIRROR=http://mirror.inode.at/gnu
 SF_HOST=http://prdownloads.sourceforge.net
 GNM_HOST=https://download.gnome.org/sources
+FD_HOST=https://www.freedesktop.org/software
 
 function fail()
 {
@@ -32,7 +33,7 @@ function download()
   if [ ! -f .downloads/$file ]; then
     pushd .downloads && wget --no-check-certificate $url && popd || fail "Failed to get $name"
   fi
-  tar xf .downloads/$file && mv $name-* $name || mv "$name"_* $name || fail "Failed to unpack $name"
+  tar xf .downloads/$file && mv $name-* $name || mv "$name"_* $name || mv "$name"src* $name || fail "Failed to unpack $name"
   patch_package $name
 }
 
@@ -79,6 +80,15 @@ function gnm_download()
   download $name $file $url
 } 
 
+function fd_download()
+{
+  name=$1
+  version=$2
+  file=$name-$version.tar.bz2
+  url=$FD_HOST/$name/release/$file
+  download $name $file $url
+}
+
 gnu_download gmp 6.1.0 tar.xz
 gnu_download mpfr 3.1.4 tar.xz 
 gnu_download mpc 1.0.3 tar.gz 
@@ -98,6 +108,7 @@ url_download libffi ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz
 url_download pcre ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 sf_download expat 2.1.1 tar.bz2
 sf_download libpng 1.6.22 tar.xz
+url_download jpeg http://tenet.dl.sourceforge.net/project/libjpeg/libjpeg/6b/jpegsrc.v6b.tar.gz
 url_download icu http://download.icu-project.org/files/icu4c/57.1/icu4c-57_1-src.tgz
 url_download json-c https://s3.amazonaws.com/json-c_releases/releases/json-c-0.12.1.tar.gz
 url_download OpenBLAS http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz
@@ -106,6 +117,7 @@ chmod -R u+w fam
 url_download openssl https://www.openssl.org/source/openssl-1.0.2h.tar.gz
 url_download Python https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz
 url_download xz http://tukaani.org/xz/xz-5.2.2.tar.xz
+url_download tiff ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.6.tar.gz
 url_download libxml2 ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz
 url_download libxslt ftp://xmlsoft.org/libxml2/libxslt-1.1.29.tar.gz
 url_download openmpi https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.bz2
@@ -119,9 +131,18 @@ gnu_download bison 3.0.4 tar.xz
 sf_download flex 2.6.0 tar.xz
 sf_download cppunit 1.12.1 tar.gz
 sf_download swig 3.0.8 tar.gz
+sf_download freetype 2.6.3 tar.gz
+
+fd_download fontconfig 2.11.95
+fd_download harfbuzz 1.2.7
 
 url_download pixman https://www.cairographics.org/releases/pixman-0.34.0.tar.gz
 url_download cairo https://www.cairographics.org/releases/cairo-1.14.6.tar.xz
 
-gnm_download glib 2.49 1 
+gnm_download glib 2.48 1 
 gnm_download gobject-introspection 1.48 0 
+gnm_download pango 1.40 1 
+gnm_download atk 2.20 0
+gnm_download gdk-pixbuf 2.34 0
+# Download an older gtk+ version that doesn't pull in GL through libepoxy
+gnm_download gtk+ 3.14 15 

@@ -1,0 +1,48 @@
+--- configure	2016-06-09 13:28:47.985512278 +0200
++++ configure.patched 2016-06-09 13:29:40.425513292 +0200
+@@ -25124,11 +25124,12 @@
+ # Check for Accessibility Toolkit flags
+ ########################################
+ 
+-if test x$enable_x11_backend = xyes; then
+-   ATK_PACKAGES="atk atk-bridge-2.0"
+-else
+-   ATK_PACKAGES="atk"
+-fi
++#if test x$enable_x11_backend = xyes; then
++#   ATK_PACKAGES="atk atk-bridge-2.0"
++#else
++#   ATK_PACKAGES="atk"
++#fi
++ATK_PACKAGES="atk"
+ 
+ 
+ pkg_failed=no
+--- gtk/a11y/gtkaccessibility.c	2016-06-09 13:38:03.985523034 +0200
++++ gtk/a11y/gtkaccessibility.c.patched	2016-06-09 13:40:13.961525548 +0200
+@@ -37,9 +37,9 @@
+ #include <gtk/gtktogglebutton.h>
+ #include <gtk/gtkaccessible.h>
+ 
+-#ifdef GDK_WINDOWING_X11
+-#include <atk-bridge.h>
+-#endif
++// #ifdef GDK_WINDOWING_X11
++// #include <atk-bridge.h>
++// #endif
+ 
+ static gboolean gail_focus_watcher      (GSignalInvocationHint *ihint,
+                                          guint                  n_param_values,
+@@ -987,9 +987,9 @@
+   _gtk_accessibility_override_atk_util ();
+   do_window_event_initialization ();
+ 
+-#ifdef GDK_WINDOWING_X11
+-  atk_bridge_adaptor_init (NULL, NULL);
+-#endif
++// #ifdef GDK_WINDOWING_X11
++//  atk_bridge_adaptor_init (NULL, NULL);
++// #endif
+ 
+   atk_misc_instance = g_object_new (GTK_TYPE_MISC_IMPL, NULL);
+ }
