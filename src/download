@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Author: Jaap Versteegh <j.r.versteegh@gmail.com>
+
 GNU_MIRROR=http://mirror.inode.at/gnu
 SF_HOST=http://prdownloads.sourceforge.net
 GNM_HOST=https://download.gnome.org/sources

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Author: Jaap Versteegh <j.r.versteegh@gmail.com>
+
 pip install --upgrade pip && \
 pip install scipy && \
 pip install matplotlib && \
