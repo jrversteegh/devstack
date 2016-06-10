@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
+# Author: Jaap Versteegh <j.r.versteegh@gmail.com>
+
 # Create external projects for contributions
 include(ExternalProject)
 include(CheckIncludeFiles)

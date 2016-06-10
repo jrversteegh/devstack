@@ -1,3 +1,5 @@
+# Author: Jaap Versteegh <j.r.versteegh@gmail.com>
+
 curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 bindir=$curdir/bin

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Author: Jaap Versteegh <j.r.versteegh@gmail.com>
+
 function fail()
 {
   msg=$1
