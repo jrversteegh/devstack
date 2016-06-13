@@ -34,6 +34,6 @@ popd
 mkdir -p .build
 pushd .build 
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake"
-make -j 8 || make -j 8 || fail "Failed to complete make"
+make -j 8 || fail "Failed to complete make"
 popd
 echo "Done!"
