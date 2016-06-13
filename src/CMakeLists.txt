@@ -190,8 +190,15 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  bzip2
+  libffi
   DEPENDS openssl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libffi
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libffi/configure ${PRE_FLAGS} 
+)
+
+ExternalProject_Add(
+  bzip2
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bzip2
   BUILD_IN_SOURCE 1
   # Arcane build procedure for bzip2...
@@ -202,16 +209,9 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   pcre
-  DEPENDS openssl
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pcre
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pcre/configure ${PRE_FLAGS} --enable-unicode-properties --enable-jit --enable-pcre16 --enable-pcre32
-)
-
-ExternalProject_Add(
-  libffi
-  DEPENDS openssl
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libffi
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libffi/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
@@ -232,14 +232,14 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   expat
-  DEPENDS openssl
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/expat
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/expat/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   libpng
-  DEPENDS openssl
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libpng
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libpng/configure ${PRE_FLAGS} 
   BUILD_COMMAND $(MAKE) INCLUDES=-I${CMAKE_INSTALL_PREFIX}/include
@@ -247,7 +247,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   jpeg
-  DEPENDS openssl
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/jpeg
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --enable-shared
@@ -255,21 +255,21 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   json-c
-  DEPENDS openssl
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/json-c
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/json-c/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
   icu
-  DEPENDS openssl
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/icu/source
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/icu/source/configure ${PRE_FLAGS} 
 )
 
 ExternalProject_Add(
   fam
-  DEPENDS openssl
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fam
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -280,7 +280,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   OpenBLAS
-  DEPENDS openssl
+  DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/OpenBLAS
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
@@ -297,7 +297,7 @@ ExternalProject_Add_Step(
 # The python interpreter. Get that up soon
 ExternalProject_Add(
   Python
-  DEPENDS libffi openssl
+  DEPENDS libffi 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Python
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared --with-ensurepip
 )
@@ -360,7 +360,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   libarchive
-  DEPENDS libxml2 openssl
+  DEPENDS libxml2
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libarchive
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libarchive/configure ${PRE_FLAGS}
 )
@@ -424,7 +424,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   glib
-  DEPENDS Python fam libxslt pcre openssl gettext
+  DEPENDS Python fam libxslt pcre gettext
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glib
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glib/configure ${GO_FLAGS} --disable-selinux --with-pcre=system 
 )
