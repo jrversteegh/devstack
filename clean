@@ -6,17 +6,19 @@ curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 cd $curdir
 
-rm -rf bin
-rm -rf doc
-rm -rf etc
-rm -rf include
-rm -rf lib
-rm -rf libexec
-rm -rf man
-rm -rf sbin
-rm -rf share
-rm -rf ssl
-rm -rf var
+if [ "X$1" == "Xdist" ]; then
+  rm -rf bin
+  rm -rf doc
+  rm -rf etc
+  rm -rf include
+  rm -rf lib
+  rm -rf libexec
+  rm -rf man
+  rm -rf sbin
+  rm -rf share
+  rm -rf ssl
+  rm -rf var
+fi
 
 rm -rf .build
 

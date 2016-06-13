@@ -6,6 +6,10 @@ curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 cd $curdir
 
+if [ "X$1" == "Xdownloads" ]; then
+  rm -rf .downloads
+fi
+
 rm -rf atk
 rm -rf autoconf
 rm -rf autogen
