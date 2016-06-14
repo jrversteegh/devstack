@@ -36,9 +36,7 @@ if [ ! -x bin/cmake ]; then
   mkdir -p .build
   pushd .build 
   cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake: stage 1"
-  make -j 8 openssl || fail "Failed to complete make up to openssl: stage 1"
-  make -j 8 cmake || fail "Failed to complete make up to cmake: stage 1"
-  make -j 8 || fail "Failed to complete make world: stage 1"
+  make -j 8 2>&1 | tee build-1.log || fail "Failed to complete make up to cmake: stage 1"
   popd
   src/clean
   rm -rf .build
@@ -48,6 +46,6 @@ fi
 pushd .build 
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake: stage 2"
 # ... and go again with full build
-make -j 8 || fail "Failed to complete make world"
+make -j 8 2>&1 | tee build-2.log || fail "Failed to complete make world"
 popd
 echo "Done!"
