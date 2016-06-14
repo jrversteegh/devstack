@@ -491,7 +491,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   pango
-  DEPENDS cairo harfbuzz
+  DEPENDS cairo 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pango
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pango/configure ${GO_FLAGS}
 )
