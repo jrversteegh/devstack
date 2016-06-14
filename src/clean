@@ -56,6 +56,7 @@ rm -rf openssl
 rm -rf pango
 rm -rf pcre
 rm -rf pixman
+rm -rf pycairo/build_directory
 rm -rf pygobject
 rm -rf Python
 rm -rf swig

@@ -103,8 +103,16 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  texinfo
+  perl
   DEPENDS gcc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/perl
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./Configure -des -Dprefix=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  texinfo
+  DEPENDS perl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/texinfo
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -122,7 +130,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   autoconf
-  DEPENDS gcc
+  DEPENDS gdb
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autoconf
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -173,7 +181,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   zlib
-  DEPENDS gcc
+  DEPENDS gc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -446,8 +454,23 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  fontconfig
+  harfbuzz
   DEPENDS freetype
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/harfbuzz
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/harfbuzz/configure ${PRE_FLAGS} --with-gobject
+)
+
+ExternalProject_Add(
+  freetype2
+  DEPENDS harfbuzz
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/freetype
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/freetype/configure ${PRE_FLAGS}
+)
+
+
+ExternalProject_Add(
+  fontconfig
+  DEPENDS freetype2
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig/configure ${PRE_FLAGS} --enable-libxml2 --disable-docs
 )
@@ -465,14 +488,6 @@ ExternalProject_Add(
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/atk
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/atk/configure ${GO_FLAGS}
 )
-
-ExternalProject_Add(
-  harfbuzz
-  DEPENDS freetype gobject-introspection
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/harfbuzz
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/harfbuzz/configure ${PRE_FLAGS} --with-gobject
-)
-
 
 ExternalProject_Add(
   pango
