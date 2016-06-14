@@ -1,4 +1,7 @@
 /.build
+/.stageroot
+/build-1.log
+/build-2.log
 /bin
 /doc
 /etc
