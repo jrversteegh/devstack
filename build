@@ -33,9 +33,9 @@ popd
 if [ ! -x root/bin/cmake ]; then
   # Create preliminary build with host tools
   mkdir -p .build
-  mkdir -p $curdir/stageroot
+  mkdir -p $curdir/.stageroot
   pushd .build 
-  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/stageroot || fail "Failed to run cmake: stage 1"
+  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/.stageroot || fail "Failed to run cmake: stage 1"
   make -j 8  >../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
   popd
   src/clean
@@ -43,8 +43,8 @@ if [ ! -x root/bin/cmake ]; then
 fi
 
 # Rerun with new cmake and tools
-if [ -d $curdir/stageroot ]; then
-  rootdir=$curdir/stageroot
+if [ -d $curdir/.stageroot ]; then
+  rootdir=$curdir/.stageroot
 else
   rootdir=$curdir/root
 fi
@@ -60,6 +60,6 @@ pushd .build
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 2"
 # ... and go again with full build
 make -j 8  >../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
-rm -rf stageroot
+rm -rf .stageroot
 popd
 echo "Done!"
