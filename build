@@ -31,18 +31,25 @@ pushd src
 ./download || fail "Failed to download some sources"
 popd
 
-mkdir -p .build
-pushd .build 
-cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake: stage 1"
-make -j 8 cmake || fail "Failed to complete make up to cmake"
-make -j 8 || fail "Failed to complete make up to cmake"
-popd
+
+if [ ! -x bin/cmake ]; then
+  mkdir -p .build
+  pushd .build 
+  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake: stage 1"
+  make -j 8 openssl || fail "Failed to complete make up to openssl: stage 1"
+  make -j 8 cmake || fail "Failed to complete make up to cmake: stage 1"
+  make -j 8 || fail "Failed to complete make up to cmake: stage 1"
+  popd
+  src/clean
+  rm -rf .build
+fi
 
 # Rerun with new cmake
-rm -rf .build
-mkdir -p .build
 pushd .build 
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake: stage 2"
-make -j 8 || fail "Failed to complete make world"
+# ... and go again with full build
+make -j 8 openssl || fail "Failed to complete make up to openssl: stage 2"
+make -j 8 cmake || fail "Failed to complete make up to cmake: stage 2"
+make -j 8 || fail "Failed to complete make world: stage 2"
 popd
 echo "Done!"
