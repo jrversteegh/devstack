@@ -16,6 +16,8 @@ rm -rf autogen
 rm -rf automake
 rm -rf bison
 rm -rf boost
+rm -rf Boost.Numpy/CMakeCache.txt
+rm -rf Boost.Numpy/CMakeFiles
 rm -rf bzip2
 rm -rf cairo
 rm -rf cmake
