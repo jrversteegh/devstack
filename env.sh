@@ -2,8 +2,8 @@
 
 curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
-bindir=$curdir/bin
-libdir=$curdir/lib
+bindir=$curdir/root/bin
+libdir=$curdir/root/lib
 if [ -z $USING_DEVSTACK ]; then
   export USING_DEVSTACK=1
   export PATH=$bindir:$PATH

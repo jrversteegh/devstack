@@ -25,27 +25,41 @@ curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 cd $curdir
 
-source env.sh
-
 pushd src 
 ./download || fail "Failed to download some sources"
 popd
 
 
-if [ ! -x bin/cmake ]; then
+if [ ! -x root/bin/cmake ]; then
+  # Create preliminary build with host tools
   mkdir -p .build
+  mkdir -p $curdir/stageroot
   pushd .build 
-  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake: stage 1"
-  make -j 8 2>&1 | tee build-1.log || fail "Failed to complete make up to cmake: stage 1"
+  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/stageroot || fail "Failed to run cmake: stage 1"
+  make -j 8  >../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
   popd
   src/clean
   rm -rf .build
 fi
 
-# Rerun with new cmake
+# Rerun with new cmake and tools
+if [ -d $curdir/stageroot ]; then
+  rootdir=$curdir/stageroot
+else
+  rootdir=$curdir/root
+fi
+bindir=$rootdir/bin
+libdir=$rootdir/lib
+export PATH=$bindir:$PATH
+export LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=$libdir/pkgconfig:$PKG_CONFIG_PATH
+
+mkdir -p .build
+mkdir -p $curdir/root
 pushd .build 
-cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir || fail "Failed to run cmake: stage 2"
+cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 2"
 # ... and go again with full build
-make -j 8 2>&1 | tee build-2.log || fail "Failed to complete make world"
+make -j 8  >../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
+rm -rf stageroot
 popd
 echo "Done!"
