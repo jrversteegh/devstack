@@ -122,7 +122,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   autoconf
-  DEPENDS gdb
+  DEPENDS gcc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autoconf
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -162,7 +162,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   gc
-  DEPENDS libatomic_ops
+  DEPENDS libatomic_ops libunistring
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gc
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -173,7 +173,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   zlib
-  DEPENDS gc
+  DEPENDS gcc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -184,10 +184,11 @@ ExternalProject_Add(
   DEPENDS zlib
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
   BUILD_IN_SOURCE 1
+  CMAKE_COMMAND = ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib
-  BUILD_COMMAND $(MAKE) depend && $(MAKE)
+  BUILD_COMMAND make depend && make
   # Allow some sleep after install, so installed libraries won't be picked up too soon.
-  INSTALL_COMMAND $(MAKE) install && sleep 5
+  INSTALL_COMMAND $(MAKE) install && sleep 2 && sync && sleep 2 && echo "*** Installed openssl"
 )
 
 ExternalProject_Add(
@@ -217,7 +218,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   guile
-  DEPENDS libtool libunistring gc libffi
+  DEPENDS gc libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/guile
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}

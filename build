@@ -29,15 +29,16 @@ pushd src
 ./download || fail "Failed to download some sources"
 popd
 
+source env.sh
 
 if [ ! -x root/bin/cmake ]; then
   # Create preliminary build with host tools
   mkdir -p .build
-  mkdir -p $curdir/.stageroot
-  pushd .stageroot && ln -sf lib lib64 && popd
+  mkdir -p $curdir/root
+  pushd root && ln -sf lib lib64 && popd
   
   pushd .build 
-  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/.stageroot || fail "Failed to run cmake: stage 1"
+  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 1"
   make -j 8  >../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
   popd
   src/clean
@@ -45,24 +46,11 @@ if [ ! -x root/bin/cmake ]; then
 fi
 
 # Rerun with new cmake and tools
-if [ -d $curdir/.stageroot ]; then
-  rootdir=$curdir/.stageroot
-else
-  rootdir=$curdir/root
-fi
-bindir=$rootdir/bin
-libdir=$rootdir/lib
-export PATH=$bindir:$PATH
-export LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH
-export PKG_CONFIG_PATH=$libdir/pkgconfig:$PKG_CONFIG_PATH
-
+[ -d root ] || failed "Expected root directory to exist at this point"
 mkdir -p .build
-mkdir -p $curdir/root
-pushd root && ln -sf lib lib64 && popd
 pushd .build 
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 2"
 # ... and go again with full build
 make -j 8  >../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
-rm -rf .stageroot
 popd
 echo "Done!"

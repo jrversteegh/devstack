@@ -1,15 +1,4 @@
 /.build
-/.stageroot
 /build-1.log
 /build-2.log
-/bin
-/doc
-/etc
-/include
-/lib
-/libexec
-/man
-/sbin
-/share
-/ssl
-/var
+/root

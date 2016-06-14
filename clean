@@ -10,7 +10,6 @@ if [ "X$1" == "Xdist" ]; then
   rm -rf root
 fi
 
-rm -rf .stageroot
 rm -rf .build
 rm -f build-1.log
 rm -f build-2.log
