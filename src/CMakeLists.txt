@@ -122,7 +122,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   autoconf
-  DEPENDS gcc
+  DEPENDS gdb
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autoconf
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
@@ -130,7 +130,6 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   automake
-  DEPENDS gcc
   DEPENDS autoconf
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/automake
   BUILD_IN_SOURCE 1
