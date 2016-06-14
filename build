@@ -34,6 +34,8 @@ if [ ! -x root/bin/cmake ]; then
   # Create preliminary build with host tools
   mkdir -p .build
   mkdir -p $curdir/.stageroot
+  pushd .stageroot && ln -sf lib lib64 && popd
+  
   pushd .build 
   cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/.stageroot || fail "Failed to run cmake: stage 1"
   make -j 8  >../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
@@ -56,6 +58,7 @@ export PKG_CONFIG_PATH=$libdir/pkgconfig:$PKG_CONFIG_PATH
 
 mkdir -p .build
 mkdir -p $curdir/root
+pushd root && ln -sf lib lib64 && popd
 pushd .build 
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 2"
 # ... and go again with full build
