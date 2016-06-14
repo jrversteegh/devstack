@@ -186,6 +186,8 @@ ExternalProject_Add(
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib
   BUILD_COMMAND $(MAKE) depend && $(MAKE)
+  # Allow some sleep after install, so installed libraries won't be picked up too soon.
+  INSTALL_COMMAND $(MAKE) install && sleep 5
 )
 
 ExternalProject_Add(
