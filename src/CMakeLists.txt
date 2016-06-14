@@ -102,6 +102,13 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --disable-multilib --enable-ld --enable-gold --enable-lto
 )
 
+ExternalProject_Add_Step(
+  gcc
+  after_install
+  DEPENDEES install
+  COMMAND cd ${CMAKE_INSTALL_PREFIX}/bin && ln -sf gcc cc
+)
+
 ExternalProject_Add(
   perl
   DEPENDS gcc
