@@ -54,6 +54,9 @@ if [ ! -x root/bin/cmake ]; then
   popd >/dev/null
   src/clean
   rm -rf .build
+  #  Clear bash' path cache
+  sync
+  hash -r
 fi
 
 # Rerun with new cmake and tools
