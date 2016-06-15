@@ -117,6 +117,13 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ./Configure -des -Dprefix=${CMAKE_INSTALL_PREFIX} -Dusethreads -Duseshrplib
 )
 
+ExternalProject_Add_Step(
+  perl
+  after_install
+  DEPENDEES install
+  COMMAND cd ${CMAKE_INSTALL_PREFIX}/lib && ln -sf perl5/5.24.0/x86_64-linux/CORE/libperl.so .
+)
+
 ExternalProject_Add(
   texinfo
   DEPENDS perl
