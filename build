@@ -52,11 +52,18 @@ if [ ! -x root/bin/cmake ]; then
   pushd cmake-prefix/src/cmake-build >/dev/null && make install >>../../../../build-1.log 2>&1 && popd >/dev/null
   echo "done."
   popd >/dev/null
-  src/clean
+  echo -n "Cleaning source... "
+  pushd src >/dev/null
+  ./clean
+  ./download >>../download.log 2>&1 || fail "Failed to download some sources"
+  popd
+  echo "done."
+  echo -n "Cleaning build... "
   rm -rf .build
   #  Clear bash' path cache
   sync
   hash -r
+  echo "done."
 fi
 
 # Rerun with new cmake and tools
