@@ -38,10 +38,14 @@ if [ ! -x root/bin/cmake ]; then
   pushd root && ln -sf lib lib64 && popd
   
   pushd .build 
-  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 1"
-  make -j 8  openssl >../build-1.log 2>&1 || fail "Failed to complete make openssl: stage 1"
+  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root >../build-1.log 2>&1 || fail "Failed to run cmake: stage 1"
+  echo "CMake stage 1 done"
+  make -j 8  openssl >>../build-1.log 2>&1 || fail "Failed to complete make openssl: stage 1"
   pushd ../src/openssl && make install >>../build-1.log 2>&1 && popd
+  echo "Openssl installed"
   make -j 8  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
+  pushd ../src/cmake && make install >>../build-1.log 2>&1 && popd
+  echo "Stage 1 done"
   popd
   src/clean
   rm -rf .build
@@ -51,7 +55,7 @@ fi
 [ -d root ] || failed "Expected root directory to exist at this point"
 mkdir -p .build
 pushd .build 
-cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 2"
+cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root >../build-2.log 2>&1 || fail "Failed to run cmake: stage 2"
 # ... and go again with full build
 make -j 8  >>../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
 popd

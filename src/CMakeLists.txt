@@ -396,6 +396,14 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX}
 )
 
+ExternalProject_Add(
+  cmake
+  # Just make sure it gets built last
+  DEPENDS curl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS}
+  INSTALL_COMMAND ""
+)
 
 ExternalProject_Add(
   bison
@@ -556,11 +564,4 @@ ExternalProject_Add(
   CMAKE_ARGS -D BOOST_ROOT=${CMAKE_INSTALL_PREFIX} -D PYTHON_EXECUTABLE=${CMAKE_INSTALL_PREFIX}/bin/python -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${CMAKE_COMPILERS} .
 )
 
-ExternalProject_Add(
-  cmake
-  # Just make sure it gets built last
-  DEPENDS Boost.NumPy curl
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS}
-)
 
