@@ -57,6 +57,7 @@ rm -rf openmpi
 rm -rf openssl
 rm -rf pango
 rm -rf pcre
+rm -rf perl
 rm -rf pixman
 rm -rf pycairo/build_directory
 rm -rf pygobject
