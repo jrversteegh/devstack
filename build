@@ -40,6 +40,7 @@ if [ ! -x root/bin/cmake ]; then
   pushd .build 
   cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 1"
   make -j 8  openssl >../build-1.log 2>&1 || fail "Failed to complete make openssl: stage 1"
+  pushd ../src/openssl && make install >>../build-1.log 2>&1 && popd
   make -j 8  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
   popd
   src/clean
@@ -52,7 +53,6 @@ mkdir -p .build
 pushd .build 
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root || fail "Failed to run cmake: stage 2"
 # ... and go again with full build
-make -j 8  openssl >../build-2.log 2>&1 || fail "Failed to complete make openssl: stage 2"
 make -j 8  >>../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
 popd
 echo "Done!"

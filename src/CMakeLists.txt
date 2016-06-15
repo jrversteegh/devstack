@@ -202,8 +202,8 @@ ExternalProject_Add(
   CMAKE_COMMAND = ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib
   BUILD_COMMAND make depend && make
-  # Allow some sleep after install, so installed libraries won't be picked up too soon.
-  INSTALL_COMMAND $(MAKE) install && sleep 2 && sync && sleep 2 && echo "*** Installed openssl"
+  # Don't install. That fails for some weird reason. We'll do that explicitly
+  INSTALL_COMMAND ""
 )
 
 ExternalProject_Add(
