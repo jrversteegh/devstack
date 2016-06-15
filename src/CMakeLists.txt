@@ -552,7 +552,7 @@ ExternalProject_Add(
 ExternalProject_Add(
   cmake
   # Just make sure it gets built last
-  DEPENDS Boost.NumPy
+  DEPENDS Boost.NumPy curl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS}
 )
