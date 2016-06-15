@@ -25,9 +25,11 @@ curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 cd $curdir
 
-pushd src 
-./download || fail "Failed to download some sources"
-popd
+pushd src >/dev/null
+echo -n "Downloading... "
+./download >../download.log 2>&1 || fail "Failed to download some sources"
+echo "done."
+popd >/dev/null
 
 source env.sh
 
@@ -35,18 +37,21 @@ if [ ! -x root/bin/cmake ]; then
   # Create preliminary build with host tools
   mkdir -p .build
   mkdir -p $curdir/root
-  pushd root && ln -sf lib lib64 && popd
+  pushd root >/dev/null && ln -sf lib lib64 && popd >/dev/null
   
-  pushd .build 
+  pushd .build >/dev/null
+  echo -n "Running cmake stage 1... "
   cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root >../build-1.log 2>&1 || fail "Failed to run cmake: stage 1"
-  echo "CMake stage 1 done"
+  echo "done."
+  echo -n "Running make openssl... "
   make -j 8  openssl >>../build-1.log 2>&1 || fail "Failed to complete make openssl: stage 1"
-  pushd ../src/openssl && make install >>../build-1.log 2>&1 && popd
-  echo "Openssl installed"
+  pushd ../src/openssl >/dev/null && make install >>../build-1.log 2>&1 && popd >/dev/null
+  echo "done."
+  echo -n "Running make world stage 1... "
   make -j 8  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
-  pushd ../src/cmake && make install >>../build-1.log 2>&1 && popd
-  echo "Stage 1 done"
-  popd
+  pushd ../src/cmake >/dev/null && make install >>../build-1.log 2>&1 && popd >/dev/null
+  echo "done."
+  popd >/dev/null
   src/clean
   rm -rf .build
 fi
@@ -54,9 +59,13 @@ fi
 # Rerun with new cmake and tools
 [ -d root ] || failed "Expected root directory to exist at this point"
 mkdir -p .build
-pushd .build 
+pushd .build >/dev/null
+echo -n "Running cmake stage 1... "
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root >../build-2.log 2>&1 || fail "Failed to run cmake: stage 2"
+echo "done."
 # ... and go again with full build
+echo -n "Running make world stage 2... "
 make -j 8  >>../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
-popd
-echo "Done!"
+echo "done."
+popd >/dev/null
+echo "Finished!"
