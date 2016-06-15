@@ -49,7 +49,7 @@ if [ ! -x root/bin/cmake ]; then
   echo "done."
   echo -n "Running make world stage 1... "
   make -j 8  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
-  pushd ../src/cmake >/dev/null && make install >>../../build-1.log 2>&1 && popd >/dev/null
+  pushd cmake-prefix/src/cmake-build >/dev/null && make install >>../../build-1.log 2>&1 && popd >/dev/null
   echo "done."
   popd >/dev/null
   src/clean
@@ -60,7 +60,7 @@ fi
 [ -d root ] || failed "Expected root directory to exist at this point"
 mkdir -p .build
 pushd .build >/dev/null
-echo -n "Running cmake stage 1... "
+echo -n "Running cmake stage 2... "
 cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root >../build-2.log 2>&1 || fail "Failed to run cmake: stage 2"
 echo "done."
 # ... and go again with full build
