@@ -114,7 +114,7 @@ ExternalProject_Add(
   DEPENDS gcc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/perl
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./Configure -des -Dprefix=${CMAKE_INSTALL_PREFIX} -Dusethreads -Dusequadmath -Dusesocks -Duseshrplib
+  CONFIGURE_COMMAND ./Configure -des -Dprefix=${CMAKE_INSTALL_PREFIX} -Dusethreads -Dusesocks -Duseshrplib
 )
 
 ExternalProject_Add(
