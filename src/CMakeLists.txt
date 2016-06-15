@@ -8,7 +8,7 @@ include(CheckIncludeFiles)
 include(CheckCSourceCompiles)
 
 set(PRE_FLAGS --prefix=${CMAKE_INSTALL_PREFIX})
-set(GO_FLAGS ${PRE_FLAGS} --disable-gtk-doc-html --disable-man)
+set(GO_FLAGS ${PRE_FLAGS} --disable-gtk-doc-html)
 set(GNU_MIRROR http://mirror.inode.at/gnu/)
 set(BOOST_CFLAGS -I${CMAKE_INSTALL_PREFIX}/include)
 set(BOOST_CXXFLAGS -I${CMAKE_INSTALL_PREFIX}/include)
@@ -114,7 +114,7 @@ ExternalProject_Add(
   DEPENDS gcc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/perl
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./Configure -des -Dprefix=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ./Configure -des -Dprefix=${CMAKE_INSTALL_PREFIX} -Dusethreads -Dusequadmath -Dusesocks -Duseshrplib
 )
 
 ExternalProject_Add(
