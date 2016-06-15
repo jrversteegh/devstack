@@ -13,5 +13,6 @@ fi
 rm -rf .build
 rm -f build-1.log
 rm -f build-2.log
+rm -f download.log
 
 src/clean

@@ -49,7 +49,7 @@ if [ ! -x root/bin/cmake ]; then
   echo "done."
   echo -n "Running make world stage 1... "
   make -j 8  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
-  pushd cmake-prefix/src/cmake-build >/dev/null && make install >>../../build-1.log 2>&1 && popd >/dev/null
+  pushd cmake-prefix/src/cmake-build >/dev/null && make install >>../../../../build-1.log 2>&1 && popd >/dev/null
   echo "done."
   popd >/dev/null
   src/clean
