@@ -1,4 +1,4 @@
-= DevStack =
+# DevStack
 
 Scripts and cmake file for downloading, building and setting up a development
 environment with gcc, boost, python and several python packages:
@@ -10,6 +10,18 @@ ipython
 This project was created to be able to run the latest development tools
 on linux systems that may not have the latest versions available through 
 their package management system.
+
+## Installation and use
+
+run:
+    ./build 
+to start download and building devstack
+
+use:
+    source env.sh
+to use devstack after it was successfully built
+
+## License
 
 The contents of this package are free to use under an MIT license:
 
