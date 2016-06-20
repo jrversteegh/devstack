@@ -14,11 +14,15 @@ their package management system.
 ## Installation and use
 
 run:
+
     ./build 
+
 to start download and building devstack
 
 use:
+
     source env.sh
+
 to use devstack after it was successfully built
 
 ## License
