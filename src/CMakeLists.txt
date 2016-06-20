@@ -83,7 +83,7 @@ ExternalProject_Add(
   DEPENDS gmp
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mpfr
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-gmp=${CMAKE_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(
@@ -91,7 +91,7 @@ ExternalProject_Add(
   DEPENDS mpfr
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mpc
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-gmp=${CMAKE_INSTALL_PREFIX} --with-mpfr=${CMAKE_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(
@@ -99,7 +99,9 @@ ExternalProject_Add(
   DEPENDS mpc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gcc
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --disable-multilib --enable-ld --enable-gold --enable-lto
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --disable-multilib --enable-ld
+--enable-gold --enable-lto --with-gmp=${CMAKE_INSTALL_PREFIX} --with-mpfr=${CMAKE_INSTALL_PREFIX} --with-mpc=${CMAKE_INSTALL_PREFIX}
+
 )
 
 ExternalProject_Add_Step(
