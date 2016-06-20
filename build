@@ -26,7 +26,7 @@ test_available wget
 
 pushd src >/dev/null
 echo -n "Downloading... "
-./download >../download.log 2>&1 || fail "Failed to download some sources"
+./download >../download.log 2>&1 || fail "Failed to download/unpack some sources"
 echo "done."
 popd >/dev/null
 
@@ -56,8 +56,8 @@ if [ ! -x root/bin/cmake ]; then
   echo -n "Cleaning source... "
   pushd src >/dev/null
   ./clean
-  ./download >>../download.log 2>&1 || fail "Failed to download some sources"
-  popd
+  ./download >>../download.log 2>&1 || fail "Failed to download/unpack some sources"
+  popd >/dev/null
   echo "done."
   echo -n "Cleaning build... "
   rm -rf .build
