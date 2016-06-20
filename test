@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Author: Jaap Versteegh <j.r.versteegh@gmail.com>
+
+function fail()
+{
+  msg=$1
+  echo $msg >&2
+  exit 1
+}
+
+function test_available()
+{
+  prog=$1
+  which $prog >/dev/null || fail "$prog is not available"
+}
+
+curdir=`dirname $BASH_SOURCE`
+curdir=`readlink -f $curdir`
+cd $curdir
+
+source env.sh
+
+test_available g++
+test_available python
+
+echo "C++: "`g++ --version | awk "NR==1"`
+echo "Python: "`python --version`
+
+python test.py 2>/dev/null || fail "Fail to run matplot lib test"
