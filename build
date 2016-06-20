@@ -14,16 +14,15 @@ function test_available()
   prog=$1
   which $prog >/dev/null || fail "$prog is required for building devstack"
 }
- 
-test_available cmake
-test_available gzip
-test_available bzip2
-test_available xz
-test_available wget
 
 curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 cd $curdir
+
+test_available gzip
+test_available bzip2
+test_available xz
+test_available wget
 
 pushd src >/dev/null
 echo -n "Downloading... "
@@ -32,6 +31,8 @@ echo "done."
 popd >/dev/null
 
 source env.sh
+
+test_available cmake
 
 if [ ! -x root/bin/cmake ]; then
   # Create preliminary build with host tools
