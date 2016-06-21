@@ -55,8 +55,12 @@
 /gdb/
 /texinfo/
 /perl/
+/asciidoc
+/xmlto
+/wget
 /git
 /glade
 /qt
 /qt-creator
 /pyside2-setup
+/doxygen
