@@ -155,7 +155,8 @@ gnm_download gdk-pixbuf 2.34 0
 gnm_download gtk+ 3.14 15 
 gnm_download pygobject 3.20 1
 url_download intltool https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz
-gnm_download glade 3.20 0
+url_download itstool http://files.itstool.org/itstool/itstool-2.0.2.tar.bz2
+gnm_download glade 3.18 3
 
 gnu_download wget 1.18 tar.xz
 sf_download asciidoc 8.6.9 tar.gz

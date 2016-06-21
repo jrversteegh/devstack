@@ -614,8 +614,15 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  itstool
+  DEPENDS intltool
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/itstool
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/itstool/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
   glade
-  DEPENDS pygobject intltool
+  DEPENDS pygobject itstool
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glade
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glade/configure ${GO_FLAGS}
 )
@@ -625,7 +632,7 @@ ExternalProject_Add(
   DEPENDS pygobject cmake
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -opensource -confirm-license -nomake examples -glib
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -opensource -confirm-license -nomake examples -glib -qt-xcb
 )
 
 ExternalProject_Add(
