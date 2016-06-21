@@ -67,3 +67,9 @@ rm -rf texinfo
 rm -rf tiff
 rm -rf xz
 rm -rf zlib
+rm -rf glade
+rm -rf git
+rm -rf qt
+rm -rf qt-creator
+
+
