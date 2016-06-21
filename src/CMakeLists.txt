@@ -596,8 +596,19 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  perl_modules
+  DEPENDS perl libxml2
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/perl_modules
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ""
+  CMAKE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ./install.sh
+)
+
+ExternalProject_Add(
   intltool
-  DEPENDS cmake asciidoc
+  DEPENDS cmake asciidoc perl_modules
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/intltool
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/intltool/configure ${PRE_FLAGS}
 )
@@ -614,7 +625,7 @@ ExternalProject_Add(
   DEPENDS pygobject cmake
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -opensource -confirm-license -nomake examples -xmlpatterns -glib -gtkstyle
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -opensource -confirm-license -nomake examples -glib
 )
 
 ExternalProject_Add(
