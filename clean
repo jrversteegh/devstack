@@ -6,8 +6,17 @@ curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 cd $curdir
 
-if [ "X$1" == "Xdist" ]; then
+if [ "X$1" == "Xroot" ]; then
   rm -rf root
+fi
+
+if [ "X$1" == "Xdownloads" ]; then
+  src/clean downloads
+fi
+
+if [ "X$1" == "Xall" ]; then
+  rm -rf root
+  src/clean downloads
 fi
 
 rm -rf .build
