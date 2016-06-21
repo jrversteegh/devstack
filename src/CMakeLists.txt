@@ -557,4 +557,44 @@ ExternalProject_Add(
   CMAKE_ARGS -D BOOST_ROOT=${CMAKE_INSTALL_PREFIX} -D PYTHON_EXECUTABLE=${CMAKE_INSTALL_PREFIX}/bin/python -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${CMAKE_COMPILERS} .
 )
 
+ExternalProject_Add(
+  asciidoc
+  DEPENDS pygobject
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/asciidoc
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure --prefix=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  xmlto
+  DEPENDS pygobject
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/xmlto
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/xmlto/configure --prefix=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  wget
+  DEPENDS cmake
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure --prefix=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  doxygen
+  DEPENDS wget
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/doxygen
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure --prefix=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  git
+  DEPENDS asciidoc xmlto wget
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/git
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure --prefix=${CMAKE_INSTALL_PREFIX}
+  BUILD_COMMAND $(MAKE) && cd contrib/subtree && $(MAKE)
+  INSTALL_COMMAND $(MAKE) install install-doc && cd contrib/subtree && $(MAKE) install install-doc
+)
+
 
