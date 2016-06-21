@@ -1,5 +1,6 @@
 #!/bin/bash
 
 # Author: Jaap Versteegh <j.r.versteegh@gmail.com>
-
-cpan install XML::Parser
+export HOME=`pwd`
+echo |cpan App::cpanminus
+cpanm XML::Parser
