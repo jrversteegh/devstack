@@ -98,8 +98,7 @@ ExternalProject_Add(
   gcc
   DEPENDS mpc
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gcc
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --disable-multilib --enable-ld
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gcc/configure ${PRE_FLAGS} --disable-multilib --enable-ld
 --enable-gold --enable-lto --with-gmp=${CMAKE_INSTALL_PREFIX} --with-mpfr=${CMAKE_INSTALL_PREFIX} --with-mpc=${CMAKE_INSTALL_PREFIX}
 
 )
@@ -130,16 +129,14 @@ ExternalProject_Add(
   texinfo
   DEPENDS perl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/texinfo
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/texinfo/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   gdb
   DEPENDS texinfo
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdb
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gdb/configure ${PRE_FLAGS}
 )
 
 # Then autotools
@@ -148,48 +145,42 @@ ExternalProject_Add(
   autoconf
   DEPENDS gdb
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autoconf
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/autoconf/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   automake
   DEPENDS autoconf
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/automake
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/automake/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   libtool
   DEPENDS automake
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libtool
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libtool/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   libunistring
   DEPENDS libtool
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libunistring
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libunistring/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   libatomic_ops
   DEPENDS libtool
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libatomic_ops
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libatomic_ops/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   gc
   DEPENDS libatomic_ops libunistring
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gc
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gc/configure ${PRE_FLAGS}
 )
 
 
