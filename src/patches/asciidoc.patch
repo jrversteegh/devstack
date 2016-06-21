@@ -1,0 +1,1659 @@
+diff -Naur ./a2x.py /home/jaapie/Sandbox/optsail/tools/asciidoc/a2x.py
+--- ./a2x.py	2016-06-21 13:33:16.384822816 +0200
++++ /home/jaapie/Sandbox/optsail/tools/asciidoc/a2x.py	2016-01-27 11:45:14.975172989 +0100
+@@ -11,13 +11,13 @@
+ 
+ import os
+ import fnmatch
+-import HTMLParser
++import html.parser
+ import re
+ import shutil
+ import subprocess
+ import sys
+ import traceback
+-import urlparse
++import urllib.parse
+ import zipfile
+ import xml.dom.minidom
+ import mimetypes
+@@ -73,7 +73,7 @@
+     errmsg('WARNING: %s' % msg)
+ 
+ def infomsg(msg):
+-    print '%s: %s' % (PROG,msg)
++    print('%s: %s' % (PROG,msg))
+ 
+ def die(msg, exit_code=1):
+     errmsg('ERROR: %s' % msg)
+@@ -99,22 +99,22 @@
+     def __getattr__(self, key):
+         try:
+             return self[key]
+-        except KeyError, k:
+-            if self.has_key('_default'):
++        except KeyError as k:
++            if '_default' in self:
+                 return self['_default']
+             else:
+-                raise AttributeError, k
++                raise AttributeError(k)
+     def __setattr__(self, key, value):
+         self[key] = value
+     def __delattr__(self, key):
+         try: del self[key]
+-        except KeyError, k: raise AttributeError, k
++        except KeyError as k: raise AttributeError(k)
+     def __repr__(self):
+         return '<AttrDict ' + dict.__repr__(self) + '>'
+     def __getstate__(self):
+         return dict(self)
+     def __setstate__(self,value):
+-        for k,v in value.items(): self[k]=v
++        for k,v in list(value.items()): self[k]=v
+ 
+ def isexecutable(file_name):
+     return os.path.isfile(file_name) and os.access(file_name, os.X_OK)
+@@ -217,12 +217,12 @@
+     try:
+         popen = subprocess.Popen(cmd, stdout=stdout, stderr=stderr,
+                 shell=True, env=ENV)
+-    except OSError, e:
++    except OSError as e:
+         die('failed: %s: %s' % (cmd, e))
+     stdoutdata, stderrdata = popen.communicate()
+     if OPTIONS.verbose:
+-        print stdoutdata
+-        print stderrdata
++        print(stdoutdata)
++        print(stderrdata)
+     if popen.returncode != 0 and raise_error:
+         die('%s returned non-zero exit status %d' % (cmd, popen.returncode))
+     return (stdoutdata, stderrdata, popen.returncode)
+@@ -237,15 +237,15 @@
+     The filter function takes a dictionary of tag attributes and returns True if
+     the URI is to be included.
+     '''
+-    class FindResources(HTMLParser.HTMLParser):
++    class FindResources(html.parser.HTMLParser):
+         # Nested parser class shares locals with enclosing function.
+         def handle_startendtag(self, tag, attrs):
+             self.handle_starttag(tag, attrs)
+         def handle_starttag(self, tag, attrs):
+             attrs = dict(attrs)
+-            if tag == tagname and (filter is None or filter(attrs)):
++            if tag == tagname and (filter is None or list(filter(attrs))):
+                 # Accept only local URIs.
+-                uri = urlparse.urlparse(attrs[attrname])
++                uri = urllib.parse.urlparse(attrs[attrname])
+                 if uri[0] in ('','file') and not uri[1] and uri[2]:
+                     result.append(uri[2])
+     if isinstance(files, str):
+@@ -435,7 +435,7 @@
+         for f in conf_files:
+             if os.path.isfile(f):
+                 verbose('loading configuration file: %s' % f)
+-                execfile(f, globals())
++                exec(compile(open(f).read(), f, 'exec'), globals())
+ 
+     def process_options(self):
+         '''
+diff -Naur ./asciidocapi.py /home/jaapie/Sandbox/optsail/tools/asciidoc/asciidocapi.py
+--- ./asciidocapi.py	2012-09-28 01:34:02.000000000 +0200
++++ /home/jaapie/Sandbox/optsail/tools/asciidoc/asciidocapi.py	2015-01-01 00:00:00.000000000 +0100
+@@ -191,8 +191,8 @@
+             try:
+                 try:
+                     if reload:
+-                        import __builtin__  # Because reload() is shadowed.
+-                        __builtin__.reload(self.asciidoc)
++                        import builtins  # Because reload() is shadowed.
++                        builtins.reload(self.asciidoc)
+                     else:
+                         import asciidoc
+                         self.asciidoc = asciidoc
+@@ -225,7 +225,7 @@
+             opts('--out-file', outfile)
+         if backend is not None:
+             opts('--backend', backend)
+-        for k,v in self.attributes.items():
++        for k,v in list(self.attributes.items()):
+             if v == '' or k[-1] in '!@':
+                 s = k
+             elif v is None: # A None value undefines the attribute.
+@@ -243,7 +243,7 @@
+                 self.asciidoc.execute(self.cmd, opts.values, args)
+             finally:
+                 self.messages = self.asciidoc.messages[:]
+-        except SystemExit, e:
++        except SystemExit as e:
+             if e.code:
+                 raise AsciiDocError(self.messages[-1])
+ 
+diff -Naur ./asciidoc.py /home/jaapie/Sandbox/optsail/tools/asciidoc/asciidoc.py
+--- ./asciidoc.py	2016-06-21 13:33:16.380822816 +0200
++++ /home/jaapie/Sandbox/optsail/tools/asciidoc/asciidoc.py	2016-01-27 11:45:14.971172989 +0100
+@@ -62,7 +62,7 @@
+         d._keys = self._keys[:]
+         return d
+     def items(self):
+-        return zip(self._keys, self.values())
++        return list(zip(self._keys, list(self.values())))
+     def keys(self):
+         return self._keys
+     def popitem(self):
+@@ -80,10 +80,10 @@
+         if d is None:
+             d = kwargs
+         dict.update(self, d)
+-        for key in d.keys():
++        for key in list(d.keys()):
+             if key not in self._keys: self._keys.append(key)
+     def values(self):
+-        return map(self.get, self._keys)
++        return list(map(self.get, self._keys))
+ 
+ class AttrDict(dict):
+     """
+@@ -98,13 +98,13 @@
+         self[key] = value
+     def __delattr__(self, key):
+         try: del self[key]
+-        except KeyError, k: raise AttributeError, k
++        except KeyError as k: raise AttributeError(k)
+     def __repr__(self):
+         return '<AttrDict ' + dict.__repr__(self) + '>'
+     def __getstate__(self):
+         return dict(self)
+     def __setstate__(self,value):
+-        for k,v in value.items(): self[k]=v
++        for k,v in list(value.items()): self[k]=v
+ 
+ class InsensitiveDict(dict):
+     """
+@@ -120,7 +120,7 @@
+     def get(self, key, default=None):
+         return dict.get(self, key.lower(), default)
+     def update(self, dict):
+-        for k,v in dict.items():
++        for k,v in list(dict.items()):
+             self[k] = v
+     def setdefault(self, key, default = None):
+         return dict.setdefault(self, key.lower(), default)
+@@ -177,7 +177,7 @@
+         self.prev_msg = ''
+ 
+     def stdout(self,msg):
+-        print msg
++        print(msg)
+ 
+     def stderr(self,msg=''):
+         if msg == self.prev_msg:  # Suppress repeated messages.
+@@ -217,7 +217,7 @@
+         all fatal errors finishing with a non-zero exit code.
+         """
+         if halt:
+-            raise EAsciiDoc, self.format(msg,linenos=False,cursor=cursor)
++            raise EAsciiDoc(self.format(msg,linenos=False,cursor=cursor))
+         else:
+             msg = self.format(msg,'ERROR: ',cursor=cursor)
+             self.stderr(msg)
+@@ -290,7 +290,7 @@
+ 
+ def assign(dst,src):
+     """Assign all attributes from 'src' object to 'dst' object."""
+-    for a,v in src.__dict__.items():
++    for a,v in list(src.__dict__.items()):
+         setattr(dst,a,v)
+ 
+ def strip_quotes(s):
+@@ -422,13 +422,13 @@
+         lists, dicts, booleans, and None.
+         """
+         _safe_names = {'None': None, 'True': True, 'False': False}
+-        if isinstance(node_or_string, basestring):
++        if isinstance(node_or_string, str):
+             node_or_string = compiler.parse(node_or_string, mode='eval')
+         if isinstance(node_or_string, Expression):
+             node_or_string = node_or_string.node
+         def _convert(node):
+             if isinstance(node, Const) and isinstance(node.value,
+-                    (basestring, int, float, long, complex)):
++                    (str, int, float, complex)):
+                  return node.value
+             elif isinstance(node, Tuple):
+                 return tuple(map(_convert, node.nodes))
+@@ -505,13 +505,13 @@
+     try:
+         d.update(get_args(s))
+         d.update(get_kwargs(s))
+-        for v in d.values():
++        for v in list(d.values()):
+             if not (isinstance(v,str) or isinstance(v,int) or isinstance(v,float) or v is None):
+                 raise Exception
+     except Exception:
+         s = s.replace('"','\\"')
+         s = s.split(',')
+-        s = map(lambda x: '"' + x.strip() + '"', s)
++        s = ['"' + x.strip() + '"' for x in s]
+         s = ','.join(s)
+         try:
+             d = {}
+@@ -519,7 +519,7 @@
+             d.update(get_kwargs(s))
+         except Exception:
+             return  # If there's a syntax error leave with {0}=attrs.
+-        for k in d.keys():  # Drop any empty positional arguments.
++        for k in list(d.keys()):  # Drop any empty positional arguments.
+             if d[k] == '': del d[k]
+     dict.update(d)
+     assert len(d) > 0
+@@ -547,7 +547,7 @@
+     try:
+         result = tuple(parse_to_list(s))
+     except Exception:
+-        raise EAsciiDoc,'malformed list: '+s
++        raise EAsciiDoc('malformed list: '+s)
+     return result
+ 
+ def parse_options(options,allowed,errmsg):
+@@ -559,7 +559,7 @@
+     if options:
+         for s in re.split(r'\s*,\s*',options):
+             if (allowed and s not in allowed) or not is_name(s):
+-                raise EAsciiDoc,'%s: %s' % (errmsg,s)
++                raise EAsciiDoc('%s: %s' % (errmsg,s))
+             result.append(s)
+     return tuple(result)
+ 
+@@ -575,7 +575,7 @@
+ def subs_quotes(text):
+     """Quoted text is marked up and the resulting text is
+     returned."""
+-    keys = config.quotes.keys()
++    keys = list(config.quotes.keys())
+     for q in keys:
+         i = q.find('|')
+         if i != -1 and q != '|' and q != '||':
+@@ -632,7 +632,7 @@
+     elif len(result) == 2:
+         return result
+     else:
+-        raise EAsciiDoc,'malformed tag: %s' % tag
++        raise EAsciiDoc('malformed tag: %s' % tag)
+ 
+ def parse_entry(entry, dict=None, unquote=False, unique_values=False,
+         allow_name_only=False, escape_delimiter=True):
+@@ -680,7 +680,7 @@
+         return None
+     if dict is not None:
+         if unique_values:
+-            for k,v in dict.items():
++            for k,v in list(dict.items()):
+                 if v == value: del dict[k]
+         dict[name] = value
+     return name,value
+@@ -693,13 +693,13 @@
+     for entry in entries:
+         if entry and not parse_entry(entry, dict, unquote, unique_values,
+                 allow_name_only, escape_delimiter):
+-            raise EAsciiDoc,'malformed section entry: %s' % entry
++            raise EAsciiDoc('malformed section entry: %s' % entry)
+ 
+ def dump_section(name,dict,f=sys.stdout):
+     """Write parameters in 'dict' as in configuration file section format with
+     section 'name'."""
+     f.write('[%s]%s' % (name,writer.newline))
+-    for k,v in dict.items():
++    for k,v in list(dict.items()):
+         k = str(k)
+         k = k.replace('=',r'\=')    # Escape = in name.
+         # Quote if necessary.
+@@ -719,9 +719,9 @@
+ 
+ def update_attrs(attrs,dict):
+     """Update 'attrs' dictionary with parsed attributes in dictionary 'dict'."""
+-    for k,v in dict.items():
++    for k,v in list(dict.items()):
+         if not is_name(k):
+-            raise EAsciiDoc,'illegal attribute name: %s' % k
++            raise EAsciiDoc('illegal attribute name: %s' % k)
+         attrs[k] = v
+ 
+ def is_attr_defined(attrs,dic):
+@@ -821,7 +821,7 @@
+                 stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+         output = p.communicate(os.linesep.join(lines))[0]
+     except Exception:
+-        raise EAsciiDoc,'filter error: %s: %s' % (filter_cmd, sys.exc_info()[1])
++        raise EAsciiDoc('filter error: %s: %s' % (filter_cmd, sys.exc_info()[1]))
+     if output:
+         result = [s.rstrip() for s in output.split(os.linesep)]
+     else:
+@@ -907,7 +907,7 @@
+                 else:
+                     lines = []
+             except Exception:
+-                raise EAsciiDoc,'%s: temp file read error' % syntax
++                raise EAsciiDoc('%s: temp file read error' % syntax)
+             result = separator.join(lines)
+         finally:
+             if os.path.isfile(tmp):
+@@ -1040,11 +1040,11 @@
+         # Remove numbered document attributes so they don't clash with
+         # attribute list positional attributes.
+         attrs = {}
+-        for k,v in document.attributes.items():
++        for k,v in list(document.attributes.items()):
+             if not re.match(r'^\d+$', k):
+                 attrs[k] = v
+         # Substitute attribute references inside dictionary values.
+-        for k,v in dictionary.items():
++        for k,v in list(dictionary.items()):
+             if v is None:
+                 del dictionary[k]
+             else:
+@@ -1221,12 +1221,14 @@
+         return tuple(result)
+ 
+ def char_encoding():
++    # TODO: not really sure how to deal with this in Py3
++    return False
+     encoding = document.attributes.get('encoding')
+     if encoding:
+         try:
+             codecs.lookup(encoding)
+-        except LookupError,e:
+-            raise EAsciiDoc,str(e)
++        except LookupError as e:
++            raise EAsciiDoc(str(e))
+     return encoding
+ 
+ def char_len(s):
+@@ -1244,7 +1246,7 @@
+ 
+ def column_width(s):
+     text = char_decode(s)
+-    if isinstance(text, unicode):
++    if isinstance(text, str):
+         width = 0
+         for c in text:
+             width += east_asian_widths[unicodedata.east_asian_width(c)]
+@@ -1257,8 +1259,7 @@
+         try:
+             return s.decode(char_encoding())
+         except Exception:
+-            raise EAsciiDoc, \
+-                "'%s' codec can't decode \"%s\"" % (char_encoding(), s)
++            raise EAsciiDoc("'%s' codec can't decode \"%s\"" % (char_encoding(), s))
+     else:
+         return s
+ 
+@@ -1294,7 +1295,7 @@
+     prev_element = None
+     prev_cursor = None
+     def __init__(self):
+-        raise AssertionError,'no class instances allowed'
++        raise AssertionError('no class instances allowed')
+     @staticmethod
+     def next():
+         """Returns class of next element on the input (None if EOF).  The
+@@ -1330,7 +1331,7 @@
+             result = tables.current
+         else:
+             if not paragraphs.isnext():
+-                raise EAsciiDoc,'paragraph expected'
++                raise EAsciiDoc('paragraph expected')
+             result = paragraphs.current
+         # Optimization: Cache answer.
+         Lex.prev_cursor = reader.cursor
+@@ -1374,7 +1375,7 @@
+             elif o == 'callouts':
+                 result = macros.subs(result,callouts=True)
+             else:
+-                raise EAsciiDoc,'illegal substitution option: %s' % o
++                raise EAsciiDoc('illegal substitution option: %s' % o)
+             trace(o, s, result)
+             if not result:
+                 break
+@@ -1662,7 +1663,7 @@
+         # Process remaining sections.
+         while not reader.eof():
+             if Lex.next() is not Title:
+-                raise EAsciiDoc,'section title expected'
++                raise EAsciiDoc('section title expected')
+             Section.translate()
+         Section.setlevel(0) # Write remaining unwritten section close tags.
+         # Substitute document parameters and write document footer.
+@@ -1750,7 +1751,7 @@
+     REV_LINE_RE = r'^(\D*(?P<revnumber>.*?),)?(?P<revdate>.*?)(:\s*(?P<revremark>.*))?$'
+     RCS_ID_RE = r'^\$Id: \S+ (?P<revnumber>\S+) (?P<revdate>\S+) \S+ (?P<author>\S+) (\S+ )?\$$'
+     def __init__(self):
+-        raise AssertionError,'no class instances allowed'
++        raise AssertionError('no class instances allowed')
+     @staticmethod
+     def parse():
+         assert Lex.next() is Title and Title.level == 0
+@@ -1833,7 +1834,7 @@
+     value = None
+     attributes = {}     # Accumulates all the parsed attribute entries.
+     def __init__(self):
+-        raise AssertionError,'no class instances allowed'
++        raise AssertionError('no class instances allowed')
+     @staticmethod
+     def isnext():
+         result = False  # Assume not next.
+@@ -1915,7 +1916,7 @@
+     match = None
+     attrs = {}
+     def __init__(self):
+-        raise AssertionError,'no class instances allowed'
++        raise AssertionError('no class instances allowed')
+     @staticmethod
+     def initialize():
+         if not 'attributelist-pattern' in document.attributes:
+@@ -1937,7 +1938,7 @@
+         reader.read()   # Discard attribute list from reader.
+         attrs = {}
+         d = AttributeList.match.groupdict()
+-        for k,v in d.items():
++        for k,v in list(d.items()):
+             if v is not None:
+                 if k == 'attrlist':
+                     v = subs_attrs(v)
+@@ -1951,7 +1952,7 @@
+     def subs(attrs):
+         '''Substitute single quoted attribute values normally.'''
+         reo = re.compile(r"^'.*'$")
+-        for k,v in attrs.items():
++        for k,v in list(attrs.items()):
+             if reo.match(str(v)):
+                 attrs[k] = Lex.subs_1(v[1:-1], config.subsnormal)
+     @staticmethod
+@@ -1974,7 +1975,7 @@
+     title = None
+     pattern = None
+     def __init__(self):
+-        raise AssertionError,'no class instances allowed'
++        raise AssertionError('no class instances allowed')
+     @staticmethod
+     def isnext():
+         result = False  # Assume not next.
+@@ -2018,7 +2019,7 @@
+     dump_dict = {}
+     linecount = None    # Number of lines in title (1 or 2).
+     def __init__(self):
+-        raise AssertionError,'no class instances allowed'
++        raise AssertionError('no class instances allowed')
+     @staticmethod
+     def translate(skipsubs=False):
+         """Parse the Title.attributes and Title.level from the reader. The
+@@ -2079,7 +2080,7 @@
+                     or (ul_len-3 < char_len(title) < ul_len+3)):
+                 return False
+             # Check for valid repetition of underline character pairs.
+-            s = ul[:2]*((ul_len+1)/2)
++            s = ul[:2] * int((ul_len+1)/2)
+             if ul != s[:ul_len]: return False
+             # Don't be fooled by back-to-back delimited blocks, require at
+             # least one alphanumeric character in title.
+@@ -2095,7 +2096,7 @@
+             if not 'title' in Title.attributes:
+                 message.warning('[titles] entry has no <title> group')
+                 Title.attributes['title'] = lines[0]
+-            for k,v in Title.attributes.items():
++            for k,v in list(Title.attributes.items()):
+                 if v is None: del Title.attributes[k]
+         try:
+             Title.level += int(document.attributes.get('leveloffset','0'))
+@@ -2111,12 +2112,12 @@
+             try:
+                 underlines = parse_list(entries['underlines'])
+             except Exception:
+-                raise EAsciiDoc,errmsg
++                raise EAsciiDoc(errmsg)
+             if len(underlines) != len(Title.underlines):
+-                raise EAsciiDoc,errmsg
++                raise EAsciiDoc(errmsg)
+             for s in underlines:
+                 if len(s) !=2:
+-                    raise EAsciiDoc,errmsg
++                    raise EAsciiDoc(errmsg)
+             Title.underlines = tuple(underlines)
+             Title.dump_dict['underlines'] = entries['underlines']
+         if 'subs' in entries:
+@@ -2126,13 +2127,13 @@
+         if 'sectiontitle' in entries:
+             pat = entries['sectiontitle']
+             if not pat or not is_re(pat):
+-                raise EAsciiDoc,'malformed [titles] sectiontitle entry'
++                raise EAsciiDoc('malformed [titles] sectiontitle entry')
+             Title.pattern = pat
+             Title.dump_dict['sectiontitle'] = pat
+         if 'blocktitle' in entries:
+             pat = entries['blocktitle']
+             if not pat or not is_re(pat):
+-                raise EAsciiDoc,'malformed [titles] blocktitle entry'
++                raise EAsciiDoc('malformed [titles] blocktitle entry')
+             BlockTitle.pattern = pat
+             Title.dump_dict['blocktitle'] = pat
+         # Load single-line title patterns.
+@@ -2140,7 +2141,7 @@
+             if k in entries:
+                 pat = entries[k]
+                 if not pat or not is_re(pat):
+-                    raise EAsciiDoc,'malformed [titles] %s entry' % k
++                    raise EAsciiDoc('malformed [titles] %s entry' % k)
+                 Title.dump_dict[k] = pat
+         # TODO: Check we have either a Title.pattern or at least one
+         # single-line title pattern -- can this be done here or do we need
+@@ -2162,7 +2163,7 @@
+         elif 'template' in AttributeList.attrs:
+             Title.sectname = AttributeList.attrs['template']
+         else:
+-            for pat,sect in config.specialsections.items():
++            for pat,sect in list(config.specialsections.items()):
+                 mo = re.match(pat,Title.attributes['title'])
+                 if mo:
+                     title = mo.groupdict().get('title')
+@@ -2218,7 +2219,7 @@
+     endtags = []  # Stack of currently open section (level,endtag) tuples.
+     ids = []      # List of already used ids.
+     def __init__(self):
+-        raise AssertionError,'no class instances allowed'
++        raise AssertionError('no class instances allowed')
+     @staticmethod
+     def savetag(level,etag):
+         """Save section end."""
+@@ -2388,12 +2389,12 @@
+                 obj[k] = v
+             else:
+                 setattr(obj,k,v)
+-        for k,v in src.items():
++        for k,v in list(src.items()):
+             if not re.match(r'\d+',k) and not is_name(k):
+-                raise EAsciiDoc, msg % (k,v)
++                raise EAsciiDoc(msg % (k,v))
+             if k == 'template':
+                 if not is_name(v):
+-                    raise EAsciiDoc, msg % (k,v)
++                    raise EAsciiDoc(msg % (k,v))
+                 copy(dst,k,v)
+             elif k == 'filter':
+                 copy(dst,k,v)
+@@ -2413,12 +2414,12 @@
+                 if v and is_re(v):
+                     copy(dst,k,v)
+                 else:
+-                    raise EAsciiDoc, msg % (k,v)
++                    raise EAsciiDoc(msg % (k,v))
+             elif k == 'style':
+                 if is_name(v):
+                     copy(dst,k,v)
+                 else:
+-                    raise EAsciiDoc, msg % (k,v)
++                    raise EAsciiDoc(msg % (k,v))
+             elif k == 'posattrs':
+                 v = parse_options(v, (), msg % (k,v))
+                 copy(dst,k,v)
+@@ -2426,13 +2427,13 @@
+                 mo = re.match(r'^(?P<style>.*)-style$',k)
+                 if mo:
+                     if not v:
+-                        raise EAsciiDoc, msg % (k,v)
++                        raise EAsciiDoc(msg % (k,v))
+                     style = mo.group('style')
+                     if not is_name(style):
+-                        raise EAsciiDoc, msg % (k,v)
++                        raise EAsciiDoc(msg % (k,v))
+                     d = {}
+                     if not parse_named_attributes(v,d):
+-                        raise EAsciiDoc, msg % (k,v)
++                        raise EAsciiDoc(msg % (k,v))
+                     if 'subs' in d:
+                         # Subs is an alias for presubs.
+                         d['presubs'] = d['subs']
+@@ -2482,24 +2483,24 @@
+         if self.style:
+             write('style='+self.style)
+         if self.styles:
+-            for style,d in self.styles.items():
++            for style,d in list(self.styles.items()):
+                 s = ''
+-                for k,v in d.items(): s += '%s=%r,' % (k,v)
++                for k,v in list(d.items()): s += '%s=%r,' % (k,v)
+                 write('%s-style=%s' % (style,s[:-1]))
+     def validate(self):
+         """Validate block after the complete configuration has been loaded."""
+         if self.is_conf_entry('delimiter') and not self.delimiter:
+-            raise EAsciiDoc,'[%s] missing delimiter' % self.defname
++            raise EAsciiDoc('[%s] missing delimiter' % self.defname)
+         if self.style:
+             if not is_name(self.style):
+-                raise EAsciiDoc, 'illegal style name: %s' % self.style
++                raise EAsciiDoc('illegal style name: %s' % self.style)
+             if not self.style in self.styles:
+                 if not isinstance(self,List):   # Lists don't have templates.
+                     message.warning('[%s] \'%s\' style not in %s' % (
+-                        self.defname,self.style,self.styles.keys()))
++                        self.defname,self.style,list(self.styles.keys())))
+         # Check all styles for missing templates.
+         all_styles_have_template = True
+-        for k,v in self.styles.items():
++        for k,v in list(self.styles.items()):
+             t = v.get('template')
+             if t and not t in config.sections:
+                 # Defer check if template name contains attributes.
+@@ -2625,7 +2626,7 @@
+                 style = self.style
+             if style in self.styles:
+                 self.attributes['style'] = style
+-                for k,v in self.styles[style].items():
++                for k,v in list(self.styles[style].items()):
+                     if k == 'posattrs':
+                         posattrs = v
+                     elif k in params:
+@@ -2654,7 +2655,7 @@
+         self.delimiters = None  # Combined delimiters regular expression.
+     def load(self,sections):
+         """Load block definition from 'sections' dictionary."""
+-        for k in sections.keys():
++        for k in list(sections.keys()):
+             if re.match(r'^'+ self.PREFIX + r'.+$',k):
+                 d = {}
+                 parse_entries(sections.get(k,()),d)
+@@ -2666,8 +2667,8 @@
+                     self.blocks.append(b)
+                 try:
+                     b.load(k,d)
+-                except EAsciiDoc,e:
+-                    raise EAsciiDoc,'[%s] %s' % (k,str(e))
++                except EAsciiDoc as e:
++                    raise EAsciiDoc('[%s] %s' % (k,str(e)))
+     def dump(self):
+         for b in self.blocks:
+             b.dump()
+@@ -2757,7 +2758,7 @@
+                 self.blocks.remove(b)
+                 break
+         else:
+-            raise EAsciiDoc,'missing section: [paradef-default]'
++            raise EAsciiDoc('missing section: [paradef-default]')
+ 
+ class List(AbstractBlock):
+     NUMBER_STYLES= ('arabic','loweralpha','upperalpha','lowerroman',
+@@ -2788,7 +2789,7 @@
+     def validate(self):
+         AbstractBlock.validate(self)
+         tags = [self.tags]
+-        tags += [s['tags'] for s in self.styles.values() if 'tags' in s]
++        tags += [s['tags'] for s in list(self.styles.values()) if 'tags' in s]
+         for t in tags:
+             if t not in lists.tags:
+                 self.error('missing section: [listtags-%s]' % t,halt=True)
+@@ -2921,7 +2922,7 @@
+         tags = set(Lists.TAGS)
+         if self.type != 'labeled':
+             tags = tags.difference(['entry','label','term'])
+-        missing = tags.difference(self.tag.keys())
++        missing = tags.difference(list(self.tag.keys()))
+         if missing:
+             self.error('missing tag(s): %s' % ','.join(missing), halt=True)
+     def translate(self):
+@@ -2973,7 +2974,7 @@
+             elif self.type == 'labeled':
+                 self.translate_entry()
+             else:
+-                raise AssertionError,'illegal [%s] list type' % self.defname
++                raise AssertionError('illegal [%s] list type' % self.defname)
+         if etag:
+             writer.write(etag,trace='list close')
+         if self.type == 'callout':
+@@ -3011,7 +3012,7 @@
+         """
+         Load listtags-* conf file sections to self.tags.
+         """
+-        for section in sections.keys():
++        for section in list(sections.keys()):
+             mo = re.match(r'^listtags-(?P<name>\w+)$',section)
+             if mo:
+                 name = mo.group('name')
+@@ -3020,7 +3021,7 @@
+                 else:
+                     d = AttrDict()
+                 parse_entries(sections.get(section,()),d)
+-                for k in d.keys():
++                for k in list(d.keys()):
+                     if k not in self.TAGS:
+                         message.warning('[%s] contains illegal list tag: %s' %
+                                 (section,k))
+@@ -3030,11 +3031,11 @@
+         for b in self.blocks:
+             # Check list has valid type.
+             if not b.type in Lists.TYPES:
+-                raise EAsciiDoc,'[%s] illegal type' % b.defname
++                raise EAsciiDoc('[%s] illegal type' % b.defname)
+             b.validate()
+     def dump(self):
+         AbstractBlocks.dump(self)
+-        for k,v in self.tags.items():
++        for k,v in list(self.tags.items()):
+             dump_section('listtags-'+k, v)
+ 
+ 
+@@ -3198,7 +3199,7 @@
+             self.error('illegal format=%s' % self.format,halt=True)
+         self.tags = self.tags or 'default'
+         tags = [self.tags]
+-        tags += [s['tags'] for s in self.styles.values() if 'tags' in s]
++        tags += [s['tags'] for s in list(self.styles.values()) if 'tags' in s]
+         for t in tags:
+             if t not in tables.tags:
+                 self.error('missing section: [tabletags-%s]' % t,halt=True)
+@@ -3219,7 +3220,7 @@
+         separator = self.separator
+         abswidth = float(config.pagewidth)
+         pcwidth = 100.0
+-        for k,v in self.attributes.items():
++        for k,v in list(self.attributes.items()):
+             if k == 'format':
+                 if v not in self.FORMATS:
+                     self.error('illegal %s=%s' % (k,v))
+@@ -3264,7 +3265,7 @@
+         """
+         if prefix is None:
+             return None
+-        names = self.styles.keys()
++        names = list(self.styles.keys())
+         names.sort()
+         for name in names:
+             if name.startswith(prefix):
+@@ -3519,10 +3520,10 @@
+         Parse the table source text and return a list of rows, each row
+         is a list of Cells.
+         """
+-        import StringIO
++        import io
+         import csv
+         rows = []
+-        rdr = csv.reader(StringIO.StringIO('\r\n'.join(text)),
++        rdr = csv.reader(io.StringIO('\r\n'.join(text)),
+                      delimiter=self.parameters.separator, skipinitialspace=True)
+         try:
+             for row in rdr:
+@@ -3676,7 +3677,7 @@
+         """
+         Load tabletags-* conf file sections to self.tags.
+         """
+-        for section in sections.keys():
++        for section in list(sections.keys()):
+             mo = re.match(r'^tabletags-(?P<name>\w+)$',section)
+             if mo:
+                 name = mo.group('name')
+@@ -3685,7 +3686,7 @@
+                 else:
+                     d = AttrDict()
+                 parse_entries(sections.get(section,()),d)
+-                for k in d.keys():
++                for k in list(d.keys()):
+                     if k not in self.TAGS:
+                         message.warning('[%s] contains illegal table tag: %s' %
+                                 (section,k))
+@@ -3698,7 +3699,7 @@
+                 default = self.blocks[i]
+                 break
+         else:
+-            raise EAsciiDoc,'missing section: [tabledef-default]'
++            raise EAsciiDoc('missing section: [tabledef-default]')
+         # Propagate defaults to unspecified table parameters.
+         for b in self.blocks:
+             if b is not default:
+@@ -3706,12 +3707,12 @@
+                 if b.template is None: b.template = default.template
+         # Check tags and propagate default tags.
+         if not 'default' in self.tags:
+-            raise EAsciiDoc,'missing section: [tabletags-default]'
++            raise EAsciiDoc('missing section: [tabletags-default]')
+         default = self.tags['default']
+         for tag in ('bodyrow','bodydata','paragraph'): # Mandatory default tags.
+             if tag not in default:
+-                raise EAsciiDoc,'missing [tabletags-default] entry: %s' % tag
+-        for t in self.tags.values():
++                raise EAsciiDoc('missing [tabletags-default] entry: %s' % tag)
++        for t in list(self.tags.values()):
+             if t is not default:
+                 if t.colspec is None: t.colspec = default.colspec
+                 if t.headrow is None: t.headrow = default.headrow
+@@ -3722,7 +3723,7 @@
+                 if t.bodydata is None: t.bodydata = default.bodydata
+                 if t.paragraph is None: t.paragraph = default.paragraph
+         # Use body tags if header and footer tags are not specified.
+-        for t in self.tags.values():
++        for t in list(self.tags.values()):
+             if not t.headrow: t.headrow = t.bodyrow
+             if not t.footrow: t.footrow = t.bodyrow
+             if not t.headdata: t.headdata = t.bodydata
+@@ -3732,7 +3733,7 @@
+             b.validate()
+     def dump(self):
+         AbstractBlocks.dump(self)
+-        for k,v in self.tags.items():
++        for k,v in list(self.tags.items()):
+             dump_section('tabletags-'+k, v)
+ 
+ class Macros:
+@@ -3811,6 +3812,8 @@
+         macro name 'name'."""
+         for m in self.macros:
+             if m.prefix == prefix:
++                if isinstance(text, bytes):
++                    text = text.decode()
+                 mo = m.reo.match(text)
+                 if mo:
+                     if m.name == name:
+@@ -3866,7 +3869,7 @@
+             self.pattern = entry
+             return
+         if not is_re(e[0]):
+-            raise EAsciiDoc,'illegal macro regular expression: %s' % e[0]
++            raise EAsciiDoc('illegal macro regular expression: %s' % e[0])
+         pattern, name = e
+         if name and name[0] in ('+','#'):
+             prefix, name = name[0], name[1:]
+@@ -3876,7 +3879,7 @@
+         mo = re.match(r'^(?P<name>[^[]*)(\[(?P<subslist>.*)\])?$', name)
+         name = mo.group('name')
+         if name and not is_name(name):
+-            raise EAsciiDoc,'illegal section name in macro entry: %s' % entry
++            raise EAsciiDoc('illegal section name in macro entry: %s' % entry)
+         subslist = mo.group('subslist')
+         if subslist is not None:
+             # Parse and validate passthrough subs.
+@@ -3898,7 +3901,7 @@
+                 return mo.group()[1:]   # Strip leading backslash.
+             d = mo.groupdict()
+             # Delete groups that didn't participate in match.
+-            for k,v in d.items():
++            for k,v in list(d.items()):
+                 if v is None: del d[k]
+             if self.name:
+                 name = self.name
+@@ -4066,7 +4069,7 @@
+             return ''
+     def validate(self,maxlistindex):
+         # Check that all list indexes referenced by callouts exist.
+-        for listindex in self.comap.keys():
++        for listindex in list(self.comap.keys()):
+             if listindex > maxlistindex:
+                 message.warning('callout refers to non-existent list item '
+                         + str(listindex))
+@@ -4075,7 +4078,7 @@
+ # Input stream Reader and output stream writer classes.
+ #---------------------------------------------------------------------------
+ 
+-UTF8_BOM = '\xef\xbb\xbf'
++UTF8_BOM = b'\xef\xbb\xbf'
+ 
+ class Reader1:
+     """Line oriented AsciiDoc input file reader. Processes include and
+@@ -4086,7 +4089,7 @@
+     def __init__(self):
+         self.f = None           # Input file object.
+         self.fname = None       # Input file name.
+-        self.next = []          # Read ahead buffer containing
++        self.ra_buf = []        # Read ahead buffer containing
+                                 # [filename,linenumber,linetext] lists.
+         self.cursor = None      # Last read() [filename,linenumber,linetext].
+         self.tabsize = 8        # Tab expansion number of spaces.
+@@ -4111,10 +4114,10 @@
+         document.attributes['infile'] = self.infile
+         document.attributes['indir'] = self.indir
+         self._lineno = 0            # The last line read from file object f.
+-        self.next = []
++        self.ra_buf = []
+         # Prefill buffer by reading the first line and then pushing it back.
+-        if Reader1.read(self):
+-            if self.cursor[2].startswith(UTF8_BOM):
++        if Reader1.read(self, False, True):
++            if isinstance(self.cursor[2], bytes) and self.cursor[2].startswith(UTF8_BOM):
+                 self.cursor[2] = self.cursor[2][len(UTF8_BOM):]
+                 self.bom = UTF8_BOM
+             self.unread(self.cursor)
+@@ -4122,16 +4125,21 @@
+     def closefile(self):
+         """Used by class methods to close nested include files."""
+         self.f.close()
+-        self.next = []
++        self.ra_buf = []
+     def close(self):
+         self.closefile()
+         self.__init__()
+-    def read(self, skip=False):
++    def read(self, skip=False, allow_binary=False):
+         """Read next line. Return None if EOF. Expand tabs. Strip trailing
+-        white space. Maintain self.next read ahead buffer. If skip=True then
++        white space. Maintain self.ra_buf read ahead buffer. If skip=True then
+         conditional exclusion is active (ifdef and ifndef macros)."""
++        def assure_string(value):
++            if not allow_binary and isinstance(value, bytes):
++                return value.decode()
++            else:
++                return value
+         # Top up buffer.
+-        if len(self.next) <= self.READ_BUFFER_MIN:
++        if len(self.ra_buf) <= self.READ_BUFFER_MIN:
+             s = self.f.readline()
+             if s:
+                 self._lineno = self._lineno + 1
+@@ -4139,16 +4147,16 @@
+                 if self.tabsize != 0:
+                     s = s.expandtabs(self.tabsize)
+                 s = s.rstrip()
+-                self.next.append([self.fname,self._lineno,s])
+-                if len(self.next) > self.READ_BUFFER_MIN:
++                self.ra_buf.append([self.fname,self._lineno,s])
++                if len(self.ra_buf) > self.READ_BUFFER_MIN:
+                     break
+                 s = self.f.readline()
+                 if s:
+                     self._lineno = self._lineno + 1
+         # Return first (oldest) buffer entry.
+-        if len(self.next) > 0:
+-            self.cursor = self.next[0]
+-            del self.next[0]
++        if len(self.ra_buf) > 0:
++            self.cursor = self.ra_buf[0]
++            del self.ra_buf[0]
+             result = self.cursor[2]
+             # Check for include macro.
+             mo = macros.match('+',r'^include[1]?$',result)
+@@ -4160,20 +4168,20 @@
+                 # Don't process include macro once the maximum depth is reached.
+                 if self.current_depth >= self.max_depth:
+                     message.warning('maximum include depth exceeded')
+-                    return result
++                    return assure_string(result)
+                 # Perform attribute substitution on include macro file name.
+                 fname = subs_attrs(mo.group('target'))
+                 if not fname:
+-                    return Reader1.read(self)   # Return next input line.
++                    return Reader1.read(self, skip, allow_binary)   # Return next input line.
+                 if self.fname != '<stdin>':
+                     fname = os.path.expandvars(os.path.expanduser(fname))
+                     fname = safe_filename(fname, os.path.dirname(self.fname))
+                     if not fname:
+-                        return Reader1.read(self)   # Return next input line.
++                        return Reader1.read(self, allow_binary=allow_binary)   # Return next input line.
+                     if not os.path.isfile(fname):
+                         if warnings:
+                             message.warning('include file not found: %s' % fname)
+-                        return Reader1.read(self)   # Return next input line.
++                        return Reader1.read(self, allow_binary=allow_binary)   # Return next input line.
+                     if mo.group('name') == 'include1':
+                         if not config.dumping:
+                             if fname not in config.include1:
+@@ -4190,7 +4198,7 @@
+                         else:
+                             # This is a configuration dump, just pass the macro
+                             # call through.
+-                            return result
++                            return assure_string(result)
+                 # Clone self and set as parent (self assumes the role of child).
+                 parent = Reader1()
+                 assign(parent,self)
+@@ -4200,20 +4208,20 @@
+                     try:
+                         val = int(attrs['tabsize'])
+                         if not val >= 0:
+-                            raise ValueError, 'not >= 0'
++                            raise ValueError('not >= 0')
+                         self.tabsize = val
+                     except ValueError:
+-                        raise EAsciiDoc, 'illegal include macro tabsize argument'
++                        raise EAsciiDoc('illegal include macro tabsize argument')
+                 else:
+                     self.tabsize = config.tabsize
+                 if 'depth' in attrs:
+                     try:
+                         val = int(attrs['depth'])
+                         if not val >= 1:
+-                            raise ValueError, 'not >= 1'
++                            raise ValueError('not >= 1')
+                         self.max_depth = self.current_depth + val
+                     except ValueError:
+-                        raise EAsciiDoc, "include macro: illegal 'depth' argument"
++                        raise EAsciiDoc("include macro: illegal 'depth' argument")
+                 # Process included file.
+                 message.verbose('include: ' + fname, linenos=False)
+                 self.open(fname)
+@@ -4224,10 +4232,10 @@
+                 result = Reader1.read(self)
+             else:
+                 result = None
+-        return result
++        return assure_string(result)
+     def eof(self):
+         """Returns True if all lines have been read."""
+-        if len(self.next) == 0:
++        if len(self.ra_buf) == 0:
+             # End of current file.
+             if self.parent:
+                 self.closefile()
+@@ -4244,13 +4252,13 @@
+         if Reader1.eof(self):
+             return None
+         else:
+-            return self.next[0][2]
++            return self.ra_buf[0][2]
+     def unread(self,cursor):
+         """Push the line (filename,linenumber,linetext) tuple back into the read
+         buffer. Note that it's up to the caller to restore the previous
+         cursor."""
+         assert cursor
+-        self.next.insert(0,cursor)
++        self.ra_buf.insert(0,cursor)
+ 
+ class Reader(Reader1):
+     """ Wraps (well, sought of) Reader1 class and implements conditional text
+@@ -4264,7 +4272,7 @@
+     def read_super(self):
+         result = Reader1.read(self,self.skip)
+         if result is None and self.skip:
+-            raise EAsciiDoc,'missing endif::%s[]' % self.skipname
++            raise EAsciiDoc('missing endif::%s[]' % self.skipname)
+         return result
+     def read(self):
+         result = self.read_super()
+@@ -4279,20 +4287,20 @@
+                 if name == 'endif':
+                     self.depth -= 1
+                     if self.depth < 0:
+-                        raise EAsciiDoc,'mismatched macro: %s' % result
++                        raise EAsciiDoc('mismatched macro: %s' % result)
+                     if self.depth == self.skipto:
+                         self.skip = False
+                         if target and self.skipname != target:
+-                            raise EAsciiDoc,'mismatched macro: %s' % result
++                            raise EAsciiDoc('mismatched macro: %s' % result)
+                 else:
+                     if name in ('ifdef','ifndef'):
+                         if not target:
+-                            raise EAsciiDoc,'missing macro target: %s' % result
++                            raise EAsciiDoc('missing macro target: %s' % result)
+                         if not attrlist:
+                             self.depth += 1
+                     elif name == 'ifeval':
+                         if not attrlist:
+-                            raise EAsciiDoc,'missing ifeval condition: %s' % result
++                            raise EAsciiDoc('missing ifeval condition: %s' % result)
+                         self.depth += 1
+             result = self.read_super()
+             if result is None:
+@@ -4306,7 +4314,7 @@
+                 self.depth = self.depth-1
+             else:
+                 if not target and name in ('ifdef','ifndef'):
+-                    raise EAsciiDoc,'missing macro target: %s' % result
++                    raise EAsciiDoc('missing macro target: %s' % result)
+                 defined = is_attr_defined(target, document.attributes)
+                 if name == 'ifdef':
+                     if attrlist:
+@@ -4321,16 +4329,16 @@
+                 elif name == 'ifeval':
+                     if safe():
+                         message.unsafe('ifeval invalid')
+-                        raise EAsciiDoc,'ifeval invalid safe document'
++                        raise EAsciiDoc('ifeval invalid safe document')
+                     if not attrlist:
+-                        raise EAsciiDoc,'missing ifeval condition: %s' % result
++                        raise EAsciiDoc('missing ifeval condition: %s' % result)
+                     cond = False
+                     attrlist = subs_attrs(attrlist)
+                     if attrlist:
+                         try:
+                             cond = eval(attrlist)
+-                        except Exception,e:
+-                            raise EAsciiDoc,'error evaluating ifeval condition: %s: %s' % (result, str(e))
++                        except Exception as e:
++                            raise EAsciiDoc('error evaluating ifeval condition: %s: %s' % (result, str(e)))
+                         message.verbose('ifeval: %s: %r' % (attrlist, cond))
+                     self.skip = not cond
+                 if not attrlist or name == 'ifeval':
+@@ -4396,7 +4404,7 @@
+             fname = self.cursor[0]
+         result = []
+         if not isinstance(terminators,list):
+-            if isinstance(terminators,basestring):
++            if isinstance(terminators,str):
+                 terminators = [re.compile(terminators)]
+             else:
+                 terminators = [terminators]
+@@ -4429,7 +4437,7 @@
+         if fname == '<stdout>':
+             self.f = sys.stdout
+         else:
+-            self.f = open(fname,'wb+')
++            self.f = open(fname,'w+')
+         message.verbose('writing: '+writer.fname,False)
+         if bom:
+             self.f.write(bom)
+@@ -4484,14 +4492,14 @@
+     word = mo.re.pattern                    # The special word.
+     template = config.specialwords[word]    # The corresponding markup template.
+     if not template in config.sections:
+-        raise EAsciiDoc,'missing special word template [%s]' % template
++        raise EAsciiDoc('missing special word template [%s]' % template)
+     if mo.group()[0] == '\\':
+         return mo.group()[1:]   # Return escaped word.
+     args = {}
+     args['words'] = mo.group()  # The full match string is argument 'words'.
+     args.update(mo.groupdict()) # Add other named match groups to the arguments.
+     # Delete groups that didn't participate in match.
+-    for k,v in args.items():
++    for k,v in list(args.items()):
+         if v is None: del args[k]
+     lines = subs_attrs(config.sections[template],args)
+     if len(lines) == 0:
+@@ -4649,14 +4657,14 @@
+         Updates 'attrs' with parsed [attributes] section entries.
+         """
+         # Delete trailing blank lines from sections.
+-        for k in sections.keys():
++        for k in list(sections.keys()):
+             for i in range(len(sections[k])-1,-1,-1):
+                 if not sections[k][i]:
+                     del sections[k][i]
+                 elif not self.entries_section(k):
+                     break
+         # Update new sections.
+-        for k,v in sections.items():
++        for k,v in list(sections.items()):
+             if k.startswith('+'):
+                 # Append section.
+                 k = k[1:]
+@@ -4814,10 +4822,10 @@
+                 try:
+                     val = int(d[name])
+                     if not val >= min_value:
+-                        raise ValueError, "not >= " + str(min_value)
++                        raise ValueError("not >= " + str(min_value))
+                     setattr(self, name, val)
+                 except ValueError:
+-                    raise EAsciiDoc, 'illegal [miscellaneous] %s entry' % name
++                    raise EAsciiDoc('illegal [miscellaneous] %s entry' % name)
+         set_if_int_ge('tabsize', d, 0)
+         set_if_int_ge('textwidth', d, 1) # DEPRECATED: Old tables only.
+ 
+@@ -4826,7 +4834,7 @@
+                 val = float(d['pagewidth'])
+                 self.pagewidth = val
+             except ValueError:
+-                raise EAsciiDoc, 'illegal [miscellaneous] pagewidth entry'
++                raise EAsciiDoc('illegal [miscellaneous] pagewidth entry')
+ 
+         if 'pageunits' in d:
+             self.pageunits = d['pageunits']
+@@ -4850,20 +4858,20 @@
+         message.linenos = False     # Disable document line numbers.
+         # Heuristic to validate that at least one configuration file was loaded.
+         if not self.specialchars or not self.tags or not lists:
+-            raise EAsciiDoc,'incomplete configuration files'
++            raise EAsciiDoc('incomplete configuration files')
+         # Check special characters are only one character long.
+-        for k in self.specialchars.keys():
++        for k in list(self.specialchars.keys()):
+             if len(k) != 1:
+-                raise EAsciiDoc,'[specialcharacters] ' \
+-                                'must be a single character: %s' % k
++                raise EAsciiDoc('[specialcharacters] ' \
++                                'must be a single character: %s' % k)
+         # Check all special words have a corresponding inline macro body.
+-        for macro in self.specialwords.values():
++        for macro in list(self.specialwords.values()):
+             if not is_name(macro):
+-                raise EAsciiDoc,'illegal special word name: %s' % macro
++                raise EAsciiDoc('illegal special word name: %s' % macro)
+             if not macro in self.sections:
+                 message.warning('missing special word macro: [%s]' % macro)
+         # Check all text quotes have a corresponding tag.
+-        for q in self.quotes.keys()[:]:
++        for q in list(self.quotes.keys())[:]:
+             tag = self.quotes[q]
+             if not tag:
+                 del self.quotes[q]  # Undefine quote.
+@@ -4873,7 +4881,7 @@
+                 if not tag in self.tags:
+                     message.warning('[quotes] %s missing tag definition: %s' % (q,tag))
+         # Check all specialsections section names exist.
+-        for k,v in self.specialsections.items():
++        for k,v in list(self.specialsections.items()):
+             if not v:
+                 del self.specialsections[k]
+             elif not v in self.sections:
+@@ -4918,7 +4926,7 @@
+         dump_section('quotes',self.quotes)
+         dump_section('specialcharacters',self.specialchars)
+         d = {}
+-        for k,v in self.specialwords.items():
++        for k,v in list(self.specialwords.items()):
+             if v in d:
+                 d[v] = '%s "%s"' % (d[v],k)   # Append word list.
+             else:
+@@ -4929,7 +4937,7 @@
+         dump_section('replacements3',self.replacements3)
+         dump_section('specialsections',self.specialsections)
+         d = {}
+-        for k,v in self.tags.items():
++        for k,v in list(self.tags.items()):
+             d[k] = '%s|%s' % v
+         dump_section('tags',d)
+         paragraphs.dump()
+@@ -4939,7 +4947,7 @@
+         tables.dump()
+         macros.dump()
+         # Dump remaining sections.
+-        for k in self.sections.keys():
++        for k in list(self.sections.keys()):
+             if not self.entries_section(k):
+                 sys.stdout.write('[%s]%s' % (k,writer.newline))
+                 for line in self.sections[k]:
+@@ -4960,7 +4968,7 @@
+         """Parse [tags] section entries into self.tags dictionary."""
+         d = {}
+         parse_entries(self.sections.get('tags',()),d)
+-        for k,v in d.items():
++        for k,v in list(d.items()):
+             if v is None:
+                 if k in self.tags:
+                     del self.tags[k]
+@@ -4971,7 +4979,7 @@
+                 if mo:
+                     self.tags[k] = (mo.group('stag'), mo.group('etag'))
+                 else:
+-                    raise EAsciiDoc,'[tag] %s value malformed' % k
++                    raise EAsciiDoc('[tag] %s value malformed' % k)
+ 
+     def tag(self, name, d=None):
+         """Returns (starttag,endtag) tuple named name from configuration file
+@@ -4979,7 +4987,7 @@
+         passed then merge with document attributes and perform attribute
+         substitution on tags."""
+         if not name in self.tags:
+-            raise EAsciiDoc, 'missing tag: %s' % name
++            raise EAsciiDoc('missing tag: %s' % name)
+         stag,etag = self.tags[name]
+         if d is not None:
+             # TODO: Should we warn if substitution drops a tag?
+@@ -4997,11 +5005,11 @@
+         # be factored to single routine.
+         d = {}
+         parse_entries(self.sections.get('specialsections',()),d,unquote=True)
+-        for pat,sectname in d.items():
++        for pat,sectname in list(d.items()):
+             pat = strip_quotes(pat)
+             if not is_re(pat):
+-                raise EAsciiDoc,'[specialsections] entry ' \
+-                                'is not a valid regular expression: %s' % pat
++                raise EAsciiDoc('[specialsections] entry ' \
++                                'is not a valid regular expression: %s' % pat)
+             if sectname is None:
+                 if pat in self.specialsections:
+                     del self.specialsections[pat]
+@@ -5012,10 +5020,10 @@
+         """Parse replacements section into self.replacements dictionary."""
+         d = OrderedDict()
+         parse_entries(self.sections.get(sect,()), d, unquote=True)
+-        for pat,rep in d.items():
++        for pat,rep in list(d.items()):
+             if not self.set_replacement(pat, rep, getattr(self,sect)):
+-                raise EAsciiDoc,'[%s] entry in %s is not a valid' \
+-                    ' regular expression: %s' % (sect,self.fname,pat)
++                raise EAsciiDoc('[%s] entry in %s is not a valid' \
++                    ' regular expression: %s' % (sect,self.fname,pat))
+ 
+     @staticmethod
+     def set_replacement(pat, rep, replacements):
+@@ -5033,7 +5041,7 @@
+     def subs_replacements(self,s,sect='replacements'):
+         """Substitute patterns from self.replacements in 's'."""
+         result = s
+-        for pat,rep in getattr(self,sect).items():
++        for pat,rep in list(getattr(self,sect).items()):
+             result = re.sub(pat, rep, result)
+         return result
+ 
+@@ -5043,15 +5051,15 @@
+         for line in self.sections.get('specialwords',()):
+             e = parse_entry(line)
+             if not e:
+-                raise EAsciiDoc,'[specialwords] entry in %s is malformed: %s' \
+-                    % (self.fname,line)
++                raise EAsciiDoc('[specialwords] entry in %s is malformed: %s' \
++                    % (self.fname,line))
+             name,wordlist = e
+             if not is_name(name):
+-                raise EAsciiDoc,'[specialwords] name in %s is illegal: %s' \
+-                    % (self.fname,name)
++                raise EAsciiDoc('[specialwords] name in %s is illegal: %s' \
++                    % (self.fname,name))
+             if wordlist is None:
+                 # Undefine all words associated with 'name'.
+-                for k,v in self.specialwords.items():
++                for k,v in list(self.specialwords.items()):
+                     if v == name:
+                         del self.specialwords[k]
+             else:
+@@ -5059,9 +5067,9 @@
+                 for word in words:
+                     word = strip_quotes(word)
+                     if not is_re(word):
+-                        raise EAsciiDoc,'[specialwords] entry in %s ' \
++                        raise EAsciiDoc('[specialwords] entry in %s ' \
+                             'is not a valid regular expression: %s' \
+-                            % (self.fname,word)
++                            % (self.fname,word))
+                     self.specialwords[word] = name
+ 
+     def subs_specialchars(self,s):
+@@ -5078,7 +5086,7 @@
+     def subs_specialchars_reverse(self,s):
+         """Perform reverse special character substitution on string 's'."""
+         result = s
+-        for k,v in self.specialchars.items():
++        for k,v in list(self.specialchars.items()):
+             result = result.replace(v, k)
+         return result
+ 
+@@ -5086,7 +5094,7 @@
+         """Search for word patterns from self.specialwords in 's' and
+         substitute using corresponding macro."""
+         result = s
+-        for word in self.specialwords.keys():
++        for word in list(self.specialwords.keys()):
+             result = re.sub(word, _subs_specialwords, result)
+         return result
+ 
+@@ -5107,7 +5115,7 @@
+         return result
+ 
+     def expand_all_templates(self):
+-        for k,v in self.sections.items():
++        for k,v in list(self.sections.items()):
+             self.sections[k] = self.expand_templates(v)
+ 
+     def section2tags(self, section, d={}, skipstart=False, skipend=False):
+@@ -5149,8 +5157,8 @@
+             etag = subs_attrs(etag, d)
+         # Put the {title} back.
+         if title:
+-            stag = map(lambda x: x.replace(chr(0), title), stag)
+-            etag = map(lambda x: x.replace(chr(0), title), etag)
++            stag = [x.replace(chr(0), title) for x in stag]
++            etag = [x.replace(chr(0), title) for x in etag]
+             d['title'] = title
+         return (stag,etag)
+ 
+@@ -5217,17 +5225,17 @@
+     def load(self,name,entries):
+         AbstractBlock.load(self,name,entries)
+         """Update table definition from section entries in 'entries'."""
+-        for k,v in entries.items():
++        for k,v in list(entries.items()):
+             if k == 'fillchar':
+                 if v and len(v) == 1:
+                     self.fillchar = v
+                 else:
+-                    raise EAsciiDoc,'malformed table fillchar: %s' % v
++                    raise EAsciiDoc('malformed table fillchar: %s' % v)
+             elif k == 'format':
+                 if v in Table_OLD.FORMATS:
+                     self.format = v
+                 else:
+-                    raise EAsciiDoc,'illegal table format: %s' % v
++                    raise EAsciiDoc('illegal table format: %s' % v)
+             elif k == 'colspec':
+                 self.colspec = v
+             elif k == 'headrow':
+@@ -5326,13 +5334,13 @@
+                     try:
+                         val = int(s)
+                         if not val > 0:
+-                            raise ValueError, 'not > 0'
++                            raise ValueError('not > 0')
+                         c.rulerwidth = val
+                     except ValueError:
+-                        raise EAsciiDoc, 'malformed ruler: bad width'
++                        raise EAsciiDoc('malformed ruler: bad width')
+             else:   # Calculate column width from inter-fillchar intervals.
+                 if not re.match(r'^'+fc+r'+$',s):
+-                    raise EAsciiDoc,'malformed ruler: illegal fillchars'
++                    raise EAsciiDoc('malformed ruler: illegal fillchars')
+                 c.rulerwidth = len(s)+1
+             self.columns.append(c)
+         # Fill in unspecified ruler widths.
+@@ -5352,7 +5360,7 @@
+         for c in self.columns:
+             totalwidth = totalwidth + c.rulerwidth
+         if totalwidth <= 0:
+-            raise EAsciiDoc,'zero width table'
++            raise EAsciiDoc('zero width table')
+         # Calculate marked up colwidths from rulerwidths.
+         for c in self.columns:
+             # Convert ruler width to output page width.
+@@ -5396,9 +5404,9 @@
+         while not reo.match(rows[i]):
+             i = i+1
+         if i == 0:
+-            raise EAsciiDoc,'missing table rows'
++            raise EAsciiDoc('missing table rows')
+         if i >= len(rows):
+-            raise EAsciiDoc,'closing [%s] underline expected' % self.defname
++            raise EAsciiDoc('closing [%s] underline expected' % self.defname)
+         return (join_lines_OLD(rows[:i]), rows[i+1:])
+     def parse_rows(self, rows, rtag, dtag):
+         """Parse rows list using the row and data tags. Returns a substituted
+@@ -5477,16 +5485,16 @@
+     def parse_csv(self,rows):
+         """Parse the list of source table rows. Each row item in the returned
+         list contains a list of cell data elements."""
+-        import StringIO
++        import io
+         import csv
+         result = []
+-        rdr = csv.reader(StringIO.StringIO('\r\n'.join(rows)),
++        rdr = csv.reader(io.StringIO('\r\n'.join(rows)),
+             skipinitialspace=True)
+         try:
+             for row in rdr:
+                 result.append(row)
+         except Exception:
+-            raise EAsciiDoc,'csv parse error: %s' % row
++            raise EAsciiDoc('csv parse error: %s' % row)
+         return result
+     def parse_dsv(self,rows):
+         """Parse the list of source table rows. Each row item in the returned
+@@ -5494,7 +5502,7 @@
+         separator = self.attributes.get('separator',':')
+         separator = literal_eval('"'+separator+'"')
+         if len(separator) != 1:
+-            raise EAsciiDoc,'malformed dsv separator: %s' % separator
++            raise EAsciiDoc('malformed dsv separator: %s' % separator)
+         # TODO If separator is preceeded by an odd number of backslashes then
+         # it is escaped and should not delimit.
+         result = []
+@@ -5521,16 +5529,16 @@
+         # Mix in document attribute list.
+         AttributeList.consume(attrs)
+         # Validate overridable attributes.
+-        for k,v in attrs.items():
++        for k,v in list(attrs.items()):
+             if k == 'format':
+                 if v not in self.FORMATS:
+-                    raise EAsciiDoc, 'illegal [%s] %s: %s' % (self.defname,k,v)
++                    raise EAsciiDoc('illegal [%s] %s: %s' % (self.defname,k,v))
+                 self.format = v
+             elif k == 'tablewidth':
+                 try:
+                     self.tablewidth = float(attrs['tablewidth'])
+                 except Exception:
+-                    raise EAsciiDoc, 'illegal [%s] %s: %s' % (self.defname,k,v)
++                    raise EAsciiDoc('illegal [%s] %s: %s' % (self.defname,k,v))
+         self.merge_attributes(attrs)
+         # Parse table ruler.
+         ruler = reader.read()
+@@ -5545,7 +5553,7 @@
+                 if line in ('',None):
+                     break;
+             if line is None:
+-                raise EAsciiDoc,'closing [%s] underline expected' % self.defname
++                raise EAsciiDoc('closing [%s] underline expected' % self.defname)
+             table.append(reader.read())
+         # EXPERIMENTAL: The number of lines in the table, requested by Benjamin Klum.
+         self.attributes['rows'] = str(len(table))
+@@ -5608,7 +5616,7 @@
+                 default = self.blocks[i]
+                 break
+         else:
+-            raise EAsciiDoc,'missing section: [OLD_tabledef-default]'
++            raise EAsciiDoc('missing section: [OLD_tabledef-default]')
+         # Set default table defaults.
+         if default.format is None: default.subs = 'fixed'
+         # Propagate defaults to unspecified table parameters.
+@@ -5627,7 +5635,7 @@
+         # Check all tables have valid fill character.
+         for b in self.blocks:
+             if not b.fillchar or len(b.fillchar) != 1:
+-                raise EAsciiDoc,'[%s] missing or illegal fillchar' % b.defname
++                raise EAsciiDoc('[%s] missing or illegal fillchar' % b.defname)
+         # Build combined tables delimiter patterns and assign defaults.
+         delimiters = []
+         for b in self.blocks:
+@@ -5682,7 +5690,7 @@
+                 if not os.path.isdir(directory):
+                     os.makedirs(directory)
+                 outfile = os.path.join(directory, outfile)
+-                perms = (zi.external_attr >> 16) & 0777
++                perms = (zi.external_attr >> 16) & 0o777
+                 message.verbose('extracting: %s' % outfile)
+                 flags = os.O_CREAT | os.O_WRONLY
+                 if sys.platform == 'win32':
+@@ -5733,7 +5741,7 @@
+                     message.verbose('archiving: %s' % arcname)
+                     zipo.write(filename, arcname, zipfile.ZIP_DEFLATED)
+         else:
+-            raise ValueError,'src must specify directory or file: %s' % src
++            raise ValueError('src must specify directory or file: %s' % src)
+     finally:
+         zipo.close()
+ 
+@@ -5787,11 +5795,11 @@
+             die('%s is already installed: %s' % (Plugin.type, plugin_dir))
+         try:
+             os.makedirs(plugin_dir)
+-        except Exception,e:
++        except Exception as e:
+             die('failed to create %s directory: %s' % (Plugin.type, str(e)))
+         try:
+             extract_zip(zip_file, plugin_dir)
+-        except Exception,e:
++        except Exception as e:
+             if os.path.isdir(plugin_dir):
+                 shutil.rmtree(plugin_dir)
+             die('failed to extract %s: %s' % (Plugin.type, str(e)))
+@@ -5823,7 +5831,7 @@
+         try:
+             message.verbose('removing: %s' % plugin_dir)
+             shutil.rmtree(plugin_dir)
+-        except Exception,e:
++        except Exception as e:
+             die('failed to delete %s: %s' % (Plugin.type, str(e)))
+ 
+     @staticmethod
+@@ -5852,7 +5860,7 @@
+             die('plugin source not found: %s' % plugin_source)
+         try:
+             create_zip(zip_file, plugin_source, skip_hidden=True)
+-        except Exception,e:
++        except Exception as e:
+             die('failed to create %s: %s' % (zip_file, str(e)))
+ 
+ 
+@@ -5903,14 +5911,14 @@
+                 if os.path.isfile(f):
+                     config.load_file(f, include=include, exclude=exclude)
+                 else:
+-                    raise EAsciiDoc,'missing configuration file: %s' % f
++                    raise EAsciiDoc('missing configuration file: %s' % f)
+     try:
+         document.attributes['python'] = sys.executable
+         for f in config.filters:
+             if not config.find_config_dir('filters', f):
+-                raise EAsciiDoc,'missing filter: %s' % f
++                raise EAsciiDoc('missing filter: %s' % f)
+         if doctype not in (None,'article','manpage','book'):
+-            raise EAsciiDoc,'illegal document type'
++            raise EAsciiDoc('illegal document type')
+         # Set processing options.
+         for o in options:
+             if o == '-c': config.dumping = True
+@@ -5922,7 +5930,7 @@
+             # the second for everything. This is so that locally set attributes
+             # available are in the global asciidoc.conf
+             if not config.load_from_dirs('asciidoc.conf',include=['attributes']):
+-                raise EAsciiDoc,'configuration file asciidoc.conf missing'
++                raise EAsciiDoc('configuration file asciidoc.conf missing')
+             load_conffiles(include=['attributes'])
+             config.load_from_dirs('asciidoc.conf')
+             if infile != '<stdin>':
+@@ -5935,7 +5943,7 @@
+         # Check the infile exists.
+         if infile != '<stdin>':
+             if not os.path.isfile(infile):
+-                raise EAsciiDoc,'input file %s missing' % infile
++                raise EAsciiDoc('input file %s missing' % infile)
+         document.infile = infile
+         AttributeList.initialize()
+         # Open input file and parse document header.
+@@ -5950,7 +5958,7 @@
+             f = document.backend + '.conf'
+             conffile = config.load_backend()
+             if not conffile:
+-                raise EAsciiDoc,'missing backend conf file: %s' % f
++                raise EAsciiDoc('missing backend conf file: %s' % f)
+             document.attributes['backend-confdir'] = os.path.dirname(conffile)
+         # backend is now known.
+         document.attributes['backend-'+document.backend] = ''
+@@ -5984,7 +5992,7 @@
+         attrs.update(config.cmd_attrs)
+         if 'title' in attrs:    # Don't pass the header title.
+             del attrs['title']
+-        for k,v in attrs.items():
++        for k,v in list(attrs.items()):
+             if v:
+                 args += ' --attribute "%s=%s"' % (k,v)
+             else:
+@@ -6027,7 +6035,7 @@
+                 reader.closefile()
+     except KeyboardInterrupt:
+         raise
+-    except Exception,e:
++    except Exception as e:
+         # Cleanup.
+         if outfile and outfile != '<stdout>' and os.path.isfile(outfile):
+             os.unlink(outfile)
+@@ -6079,13 +6087,13 @@
+     if n == 0:
+         if topic != 'topics':
+             message.stderr('help topic not found: [%s] in %s' % (topic, help_file))
+-        message.stderr('available help topics: %s' % ', '.join(config.sections.keys()))
++        message.stderr('available help topics: %s' % ', '.join(list(config.sections.keys())))
+         sys.exit(1)
+     elif n > 1:
+         message.stderr('ambiguous help topic: %s' % topic)
+     else:
+         for line in lines:
+-            print >>f, line
++            print(line, file=f)
+ 
+ ### Used by asciidocapi.py ###
+ def execute(cmd,opts,args):
