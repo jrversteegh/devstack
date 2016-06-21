@@ -59,8 +59,10 @@
 /xmlto
 /wget
 /git
+/intltool
 /glade
 /qt
+/qtbase
 /qt-creator
 /pyside2-setup
 /doxygen

@@ -199,7 +199,6 @@ ExternalProject_Add(
   DEPENDS zlib
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
   BUILD_IN_SOURCE 1
-  CMAKE_COMMAND = ""
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib
   BUILD_COMMAND make depend && make
   # Don't install. That fails for some weird reason. We'll do that explicitly
@@ -344,7 +343,7 @@ ExternalProject_Add(
   libxml2
   DEPENDS xz icu
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libxml2
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libxml2/configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX} --with-icu --with-xpath LDFLAGS=$(LDFLAGS)
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libxml2/configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX} --with-icu --with-xpath 
   INSTALL_COMMAND $(MAKE) install
 )
 
@@ -390,11 +389,17 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  cmake
-  # Just make sure it gets built last
+  wget
   DEPENDS curl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  cmake
+  DEPENDS wget
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS} --system-curl
   INSTALL_COMMAND ""
 )
 
@@ -572,19 +577,12 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/xmlto/configure ${PRE_FLAGS}
 )
 
-ExternalProject_Add(
-  wget
-  DEPENDS cmake
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS}
-)
 
 ExternalProject_Add(
   doxygen
-  DEPENDS wget
+  DEPENDS cmake
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/doxygen
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(
@@ -592,15 +590,38 @@ ExternalProject_Add(
   DEPENDS asciidoc xmlto wget
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/git
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-gitconfig=etc/gitconfig --with-gitattributes=etc/gitattributes
   BUILD_COMMAND $(MAKE) && cd contrib/subtree && $(MAKE)
   INSTALL_COMMAND $(MAKE) install install-doc && cd contrib/subtree && $(MAKE) install install-doc
 )
 
 ExternalProject_Add(
+  intltool
+  DEPENDS cmake asciidoc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/intltool
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/intltool/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
   glade
-  DEPENDS pygobject
+  DEPENDS pygobject intltool
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glade
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glade/configure ${GO_FLAGS}
 )
 
+ExternalProject_Add(
+  qt
+  DEPENDS pygobject cmake
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -opensource -confirm-license -nomake examples -xmlpatterns -glib -gtkstyle
+)
+
+ExternalProject_Add(
+  qt-creator
+  DEPENDS qt
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt-creator
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND qmake -r
+  INSTALL_COMMAND $(MAKE) install INSTALL_ROOT=${CMAKE_INSTALL_PREFIX}
+)

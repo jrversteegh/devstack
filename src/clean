@@ -67,12 +67,14 @@ rm -rf texinfo
 rm -rf tiff
 rm -rf xz
 rm -rf zlib
+rm -rf intltool
 rm -rf glade
 rm -rf asciidoc
 rm -rf xmlto
 rm -rf wget
 rm -rf git
 rm -rf qt
+rm -rf qtbase
 rm -rf qt-creator
 rm -rf pyside2-setup
 rm -rf doxygen
