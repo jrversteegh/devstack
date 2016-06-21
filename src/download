@@ -166,6 +166,9 @@ url_download doxygen http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.src.ta
 
 url_download qt http://ftp2.nluug.nl/languages/qt/archive/qt/5.7/5.7.0/single/qt-everywhere-opensource-src-5.7.0.tar.gz
 if [ -d qt-everywhere-opensource-src-5.7.0 ]; then mv qt-everywhere-opensource-src-5.7.0 qt; fi
+# We don't care about the wayland extension for now
+if [ -d qt/qtwayland ]; then rm -rf qt/qtwayland; fi
+
 url_download qt-creator http://ftp2.nluug.nl/languages/qt/official_releases/qtcreator/4.0/4.0.2/qt-creator-opensource-src-4.0.2.tar.gz
 if [ -d qt-creator-opensource-src-4.0.2 ]; then mv qt-creator-opensource-src-4.0.2 qt-creator; fi
 
