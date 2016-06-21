@@ -562,21 +562,21 @@ ExternalProject_Add(
   DEPENDS pygobject
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/asciidoc
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure --prefix=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   xmlto
   DEPENDS pygobject
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/xmlto
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/xmlto/configure --prefix=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/xmlto/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
   wget
   DEPENDS cmake
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure --prefix=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
@@ -584,7 +584,7 @@ ExternalProject_Add(
   DEPENDS wget
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/doxygen
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure --prefix=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
@@ -592,9 +592,15 @@ ExternalProject_Add(
   DEPENDS asciidoc xmlto wget
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/git
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure --prefix=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
   BUILD_COMMAND $(MAKE) && cd contrib/subtree && $(MAKE)
   INSTALL_COMMAND $(MAKE) install install-doc && cd contrib/subtree && $(MAKE) install install-doc
 )
 
+ExternalProject_Add(
+  glade
+  DEPENDS pygobject
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glade
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glade/configure ${GO_FLAGS}
+)
 
