@@ -199,7 +199,7 @@ ExternalProject_Add(
   DEPENDS zlib
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib --openssldir=${CMAKE_INSTALL_PREFIX}/etc/ssl
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/Configure ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib --openssldir=${CMAKE_INSTALL_PREFIX}/etc/ssl linux-x86_64
   BUILD_COMMAND make depend && make
   # Don't install. That fails for some weird reason. We'll do that explicitly
   INSTALL_COMMAND ""
