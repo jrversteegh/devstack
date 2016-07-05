@@ -384,15 +384,16 @@ ExternalProject_Add(
 ExternalProject_Add(
   nettle
   DEPENDS libarchive
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS} --disable-static
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/nettle
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/nettle/configure ${PRE_FLAGS} --disable-static
 )
 
 ExternalProject_Add(
   gnutls
   DEPENDS nettle
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS} --with-default-trust-store-file=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gnutls
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-default-trust-store-file=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt --with-included-libtasn1 --without-p11-kit
 )
 
 ExternalProject_Add(
