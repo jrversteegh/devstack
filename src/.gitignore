@@ -67,3 +67,5 @@
 /qt-creator
 /pyside2-setup
 /doxygen
+/nettle
+/gnutls

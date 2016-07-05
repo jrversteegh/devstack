@@ -199,7 +199,7 @@ ExternalProject_Add(
   DEPENDS zlib
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/config ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib --openssldir=${CMAKE_INSTALL_PREFIX}/etc/ssl
   BUILD_COMMAND make depend && make
   # Don't install. That fails for some weird reason. We'll do that explicitly
   INSTALL_COMMAND ""
@@ -382,8 +382,22 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-  curl
+  nettle
   DEPENDS libarchive
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS} --disable-static
+)
+
+ExternalProject_Add(
+  gnutls
+  DEPENDS nettle
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS} --with-default-trust-store-file=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt
+)
+
+ExternalProject_Add(
+  curl
+  DEPENDS gnutls
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/curl
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX}
 )

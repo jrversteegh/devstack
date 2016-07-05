@@ -158,6 +158,8 @@ url_download intltool https://launchpad.net/intltool/trunk/0.51.0/+download/intl
 url_download itstool http://files.itstool.org/itstool/itstool-2.0.2.tar.bz2
 gnm_download glade 3.18 3
 
+gnu_download nettle 3.2 tar.gz
+url_download gnutls ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/gnutls-3.5.1.tar.xz
 gnu_download wget 1.18 tar.xz
 sf_download asciidoc 8.6.9 tar.gz
 url_download xmlto https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.28.tar.gz
