@@ -658,3 +658,13 @@ ExternalProject_Add(
   CONFIGURE_COMMAND qmake -r
   INSTALL_COMMAND $(MAKE) install INSTALL_ROOT=${CMAKE_INSTALL_PREFIX}
 )
+
+ExternalProject_Add(
+  pyside
+  DEPENDS qt Python
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pyside-setup
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py build
+  INSTALL_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py install
+)
