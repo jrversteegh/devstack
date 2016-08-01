@@ -65,7 +65,7 @@
 /qt
 /qtbase
 /qt-creator
-/pyside2-setup
+/pyside-setup
 /doxygen
 /nettle
 /gnutls
