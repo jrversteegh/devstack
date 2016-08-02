@@ -28,6 +28,12 @@ function download()
   name=$1
   file=$2
   url=$3
+  unp1=`basename $file .tar.gz`
+  unp2=`basename $file .tar.bz2`
+  unp3=`basename $file .tar.xz`
+  unp4=`basename $file .tgz`
+  # patch level 1 (qt)
+  unpp=`basename $file "-1.tar.gz"`
   if [ -d $name ]; then
     return 0
   fi
@@ -36,7 +42,9 @@ function download()
     pushd .downloads && wget --no-check-certificate $url && popd || fail "Failed to get $name"
   fi
   tar xf .downloads/$file && \
-    if [ ! -d $name ]; then mv $name-* $name || mv "$name"_* $name || mv "$name"src* $name; fi || \
+    if [ ! -d $name ]; then mv $name-* $name || mv "$name"_* $name || mv "$name"src* $name || \
+      mv "$unp1" "$name" || mv "$unp2" "$name" || mv "$unp3" "$name" || mv "$unp4" "$name" || \
+      mv "$unpp" "$name"; fi || \
     fail "Failed to unpack $name"
   patch_package $name
 }
@@ -108,6 +116,7 @@ gnu_download guile 2.0.9 tar.xz
 gnu_download autogen 5.18.9 tar.xz rel5.18.9
 gnu_download autoconf 2.69 tar.xz 
 gnu_download automake 1.15 tar.xz
+gnu_download gperf 3.0.4 tar.gz
 
 url_download zlib http://zlib.net/zlib-1.2.8.tar.gz
 url_download bzip2 http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
@@ -166,13 +175,12 @@ url_download xmlto https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.28.tar.
 url_download git https://www.kernel.org/pub/software/scm/git/git-2.9.0.tar.xz
 url_download doxygen http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.src.tar.gz
 
-url_download qt http://ftp2.nluug.nl/languages/qt/archive/qt/5.7/5.7.0/single/qt-everywhere-opensource-src-5.7.0.tar.gz
-if [ -d qt-everywhere-opensource-src-5.7.0 ]; then mv qt-everywhere-opensource-src-5.7.0 qt; fi
+url_download webkitgtk https://webkitgtk.org/releases/webkitgtk-2.12.3.tar.xz
+url_download qt http://ftp2.nluug.nl/languages/qt/archive/qt/5.6/5.6.1-1/single/qt-everywhere-opensource-src-5.6.1-1.tar.gz 
 # We don't care about the wayland extension for now
 if [ -d qt/qtwayland ]; then rm -rf qt/qtwayland; fi
 
-url_download qt-creator http://ftp2.nluug.nl/languages/qt/official_releases/qtcreator/4.0/4.0.2/qt-creator-opensource-src-4.0.2.tar.gz
-if [ -d qt-creator-opensource-src-4.0.2 ]; then mv qt-creator-opensource-src-4.0.2 qt-creator; fi
+url_download qt-creator http://ftp2.nluug.nl/languages/qt/official_releases/qtcreator/4.0/4.0.3/qt-creator-opensource-src-4.0.3.tar.gz
 
 if [ ! -d pyside-setup ]; then
   git clone --recursive git://code.qt.io/pyside/pyside-setup.git || fail "Failed to get PySide from git"

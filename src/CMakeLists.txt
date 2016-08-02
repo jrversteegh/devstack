@@ -247,6 +247,14 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  gperf
+  DEPENDS autogen
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gperf
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
   expat
   DEPENDS libffi
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/expat
@@ -643,8 +651,15 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  webkitgtk
+  DEPENDS pygobject gperf
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/webkitgtk
+  CMAKE_ARGS -D PORT=GTK
+)
+
+ExternalProject_Add(
   qt
-  DEPENDS pygobject cmake
+  DEPENDS webkitgtk cmake
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -no-libinput -opensource -confirm-license -nomake examples -glib -qt-xcb

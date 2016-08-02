@@ -69,3 +69,5 @@
 /doxygen
 /nettle
 /gnutls
+/gperf
+/webkitgtk
