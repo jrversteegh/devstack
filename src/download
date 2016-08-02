@@ -156,6 +156,7 @@ url_download pixman https://www.cairographics.org/releases/pixman-0.34.0.tar.gz
 url_download cairo https://www.cairographics.org/releases/cairo-1.14.6.tar.xz
 
 gnm_download glib 2.48 1 
+gnm_download glib-networking 2.48 2
 gnm_download gobject-introspection 1.48 0 
 gnm_download pango 1.40 1 
 gnm_download atk 2.20 0
@@ -166,6 +167,8 @@ gnm_download pygobject 3.20 1
 url_download intltool https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz
 url_download itstool http://files.itstool.org/itstool/itstool-2.0.2.tar.bz2
 gnm_download glade 3.18 3
+gnm_download vala 0.32 1
+gnm_download libsoup 2.54 1
 
 gnu_download nettle 3.2 tar.gz
 url_download gnutls ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/gnutls-3.5.1.tar.xz

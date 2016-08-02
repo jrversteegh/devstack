@@ -71,3 +71,6 @@
 /gnutls
 /gperf
 /webkitgtk
+/glib-networking
+/libsoup
+/vala

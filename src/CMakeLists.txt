@@ -477,6 +477,13 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  glib-networking
+  DEPENDS glib gnutls
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glib-networking
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glib-networking/configure ${GO_FLAGS} 
+)
+
+ExternalProject_Add(
   gobject-introspection
   DEPENDS glib 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gobject-introspection
@@ -651,10 +658,24 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  vala
+  DEPENDS glade 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vala
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/vala/configure ${GO_FLAGS}
+)
+
+ExternalProject_Add(
+  libsoup
+  DEPENDS vala glib-networking
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libsoup
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libsoup/configure ${GO_FLAGS}
+)
+
+ExternalProject_Add(
   webkitgtk
-  DEPENDS pygobject gperf
+  DEPENDS pygobject gperf libsoup
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/webkitgtk
-  CMAKE_ARGS -D PORT=GTK
+  CMAKE_ARGS -D PORT=GTK -D ENABLE_CREDENTIAL_STORAGE=0 -D ENABLE_GEOLOCATION=0 -D ENABLE_SPELLCHECK=0 -D USE_LIBNOTIFY=0 -D USE_LIBHYPHEN=0
 )
 
 ExternalProject_Add(
