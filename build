@@ -19,6 +19,11 @@ curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 cd $curdir
 
+if [ -z "$DEVSTACK_TARGET" ]; then
+  DEVSTACK_TARGET=$curdir/root
+fi
+export DEVSTACK_TARGET
+
 test_available gzip
 test_available bzip2
 test_available xz
@@ -34,15 +39,15 @@ source env.sh
 
 test_available cmake
 
-if [ ! -x root/bin/cmake ]; then
+if [ ! -x "$DEVSTACK_TARGET/bin/cmake" ]; then
   # Create preliminary build with host tools
   mkdir -p .build
-  mkdir -p $curdir/root
-  pushd root >/dev/null && ln -sf lib lib64 && popd >/dev/null
+  mkdir -p "$DEVSTACK_TARGET"
+  pushd "$DEVSTACK_TARGET" >/dev/null && ln -sf lib lib64 && popd >/dev/null
   
   pushd .build >/dev/null
   echo -n "Running cmake stage 1... "
-  cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root >../build-1.log 2>&1 || fail "Failed to run cmake: stage 1"
+  cmake ../src -DCMAKE_INSTALL_PREFIX="$DEVSTACK_TARGET" >../build-1.log 2>&1 || fail "Failed to run cmake: stage 1"
   echo "done."
   echo -n "Running make openssl... "
   make -j 8  openssl >>../build-1.log 2>&1 || fail "Failed to complete make openssl: stage 1"
@@ -68,11 +73,11 @@ if [ ! -x root/bin/cmake ]; then
 fi
 
 # Rerun with new cmake and tools
-[ -d root ] || failed "Expected root directory to exist at this point"
+[ -d "$DEVSTACK_TARGET" ] || failed "Expected targer directory to exist at this point"
 mkdir -p .build
 pushd .build >/dev/null
 echo -n "Running cmake stage 2... "
-cmake ../src -DCMAKE_INSTALL_PREFIX=$curdir/root >../build-2.log 2>&1 || fail "Failed to run cmake: stage 2"
+cmake ../src -DCMAKE_INSTALL_PREFIX="$DEVSTACK_TARGET" >../build-2.log 2>&1 || fail "Failed to run cmake: stage 2"
 echo "done."
 # ... and go again with full build
 echo -n "Running make world stage 2... "

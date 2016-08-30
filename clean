@@ -6,8 +6,13 @@ curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 cd $curdir
 
-if [ "X$1" == "Xroot" ]; then
-  rm -rf root
+if [ -z "$DEVSTACK_TARGET" ]; then
+  DEVSTACK_TARGET=$curdir/root
+fi
+export DEVSTACK_TARGET
+
+if [ "X$1" == "Xtarget" ]; then
+  rm -rf "$DEVSTACK_TARGET"
 fi
 
 if [ "X$1" == "Xdownloads" ]; then
@@ -15,7 +20,7 @@ if [ "X$1" == "Xdownloads" ]; then
 fi
 
 if [ "X$1" == "Xall" ]; then
-  rm -rf root
+  rm -rf "$DEVSTACK_TARGET"
   src/clean downloads
 fi
 

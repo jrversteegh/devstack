@@ -2,9 +2,15 @@
 
 curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
-bindir=$curdir/root/bin
-libdir=$curdir/root/lib
-sharedir=$curdir/root/share
+
+if [ -z "$DEVSTACK_TARGET" ]; then
+  DEVSTACK_TARGET=$curdir/root
+fi
+export DEVSTACK_TARGET
+
+bindir=$DEVSTACK_TARGET/bin
+libdir=$DEVSTACK_TARGET/lib
+sharedir=$DEVSTACK_TARGET/share
 if [ -z $USING_DEVSTACK ]; then
   export USING_DEVSTACK=1
   export PATH=$bindir:$PATH
