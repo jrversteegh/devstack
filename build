@@ -2,6 +2,10 @@
 
 # Author: Jaap Versteegh <j.r.versteegh@gmail.com>
 
+if [ -z $CORES ]; then
+  CORES=6
+fi
+
 function fail()
 {
   msg=$1
@@ -23,6 +27,7 @@ if [ -z "$DEVSTACK_TARGET" ]; then
   DEVSTACK_TARGET=$curdir/root
 fi
 export DEVSTACK_TARGET
+echo "Building to: $DEVSTACK_TARGET"
 
 test_available gzip
 test_available bzip2
@@ -43,6 +48,7 @@ if [ ! -x "$DEVSTACK_TARGET/bin/cmake" ]; then
   # Create preliminary build with host tools
   mkdir -p .build
   mkdir -p "$DEVSTACK_TARGET"
+  cp env.sh "$DEVSTACK_TARGET"
   pushd "$DEVSTACK_TARGET" >/dev/null && ln -sf lib lib64 && popd >/dev/null
   
   pushd .build >/dev/null
@@ -50,11 +56,14 @@ if [ ! -x "$DEVSTACK_TARGET/bin/cmake" ]; then
   cmake ../src -DCMAKE_INSTALL_PREFIX="$DEVSTACK_TARGET" >../build-1.log 2>&1 || fail "Failed to run cmake: stage 1"
   echo "done."
   echo -n "Running make openssl... "
-  make -j 8  openssl >>../build-1.log 2>&1 || fail "Failed to complete make openssl: stage 1"
+  make -j $CORES  openssl >>../build-1.log 2>&1 || fail "Failed to complete make openssl: stage 1"
   pushd ../src/openssl >/dev/null && make install >>../../build-1.log 2>&1 && popd >/dev/null
   echo "done."
-  echo -n "Running make world stage 1... "
-  make -j 8  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
+  echo -n "Running make flex... "
+  make -j $CORES flex  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
+  echo "done."
+  echo -n "Running make cmake... "
+  make -j $CORES cmake  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
   pushd cmake-prefix/src/cmake-build >/dev/null && make install >>../../../../build-1.log 2>&1 && popd >/dev/null
   echo "done."
   popd >/dev/null
@@ -80,8 +89,8 @@ echo -n "Running cmake stage 2... "
 cmake ../src -DCMAKE_INSTALL_PREFIX="$DEVSTACK_TARGET" >../build-2.log 2>&1 || fail "Failed to run cmake: stage 2"
 echo "done."
 # ... and go again with full build
-echo -n "Running make world stage 2... "
-make -j 8  >>../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
+echo -n "Running make world... "
+make -j $CORES  >>../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
 echo "done."
 popd >/dev/null
 echo "Finished!"

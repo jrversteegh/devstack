@@ -4,7 +4,11 @@ curdir=`dirname $BASH_SOURCE`
 curdir=`readlink -f $curdir`
 
 if [ -z "$DEVSTACK_TARGET" ]; then
-  DEVSTACK_TARGET=$curdir/root
+  if [ -d $curdir/root ]; then
+    DEVSTACK_TARGET=$curdir/root
+  else
+    DEVSTACK_TARGET=$curdir
+  fi
 fi
 export DEVSTACK_TARGET
 

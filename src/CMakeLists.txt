@@ -476,12 +476,6 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glib/configure ${GO_FLAGS} --disable-selinux --with-pcre=system 
 )
 
-ExternalProject_Add(
-  glib-networking
-  DEPENDS glib gnutls
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glib-networking
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glib-networking/configure ${GO_FLAGS} 
-)
 
 ExternalProject_Add(
   gobject-introspection
@@ -662,6 +656,13 @@ ExternalProject_Add(
   DEPENDS glade 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vala
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/vala/configure ${GO_FLAGS}
+)
+
+ExternalProject_Add(
+  glib-networking
+  DEPENDS glib gnutls intltool
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glib-networking
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/glib-networking/configure ${GO_FLAGS} 
 )
 
 ExternalProject_Add(
