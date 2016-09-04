@@ -19,8 +19,8 @@ function test_available()
   which $prog >/dev/null || fail "$prog is required for building devstack"
 }
 
-curdir=`dirname $BASH_SOURCE`
-curdir=`readlink -f $curdir`
+curfile=`readlink -f $BASH_SOURCE`
+curdir=`dirname $curfile`
 cd $curdir
 
 if [ -z "$DEVSTACK_TARGET" ]; then

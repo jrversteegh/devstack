@@ -2,8 +2,8 @@
 
 # Author: Jaap Versteegh <j.r.versteegh@gmail.com>
 
-curdir=`dirname $BASH_SOURCE`
-curdir=`readlink -f $curdir`
+curfile=`readlink -f $BASH_SOURCE`
+curdir=`dirname $curfile`
 cd $curdir
 
 if [ -z "$DEVSTACK_TARGET" ]; then
