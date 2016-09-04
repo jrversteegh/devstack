@@ -323,7 +323,7 @@ ExternalProject_Add(
   Python
   DEPENDS libffi 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Python
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared --with-ensurepip
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared --with-ensurepip --with-gcc=${CMAKE_INSTALL_PREFIX}/bin/gcc
 )
 
 ExternalProject_Add_Step(

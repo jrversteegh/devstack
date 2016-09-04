@@ -41,6 +41,8 @@ echo "done."
 popd >/dev/null
 
 source env.sh
+echo "PATH: $PATH"
+echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
 
 test_available cmake
 
@@ -60,7 +62,7 @@ if [ ! -x "$DEVSTACK_TARGET/bin/cmake" ]; then
   pushd ../src/openssl >/dev/null && make install >>../../build-1.log 2>&1 && popd >/dev/null
   echo "done."
   echo -n "Running make flex... "
-  make -j $CORES flex  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
+  make -j $CORES flex >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
   echo "done."
   echo -n "Running make cmake... "
   make -j $CORES cmake  >>../build-1.log 2>&1 || fail "Failed to complete make: stage 1"
@@ -80,6 +82,9 @@ if [ ! -x "$DEVSTACK_TARGET/bin/cmake" ]; then
   hash -r
   echo "done."
 fi
+
+# Clean bash' path cache
+hash -r
 
 # Rerun with new cmake and tools
 [ -d "$DEVSTACK_TARGET" ] || failed "Expected targer directory to exist at this point"
