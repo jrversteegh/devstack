@@ -334,6 +334,14 @@ ExternalProject_Add_Step(
 )
 
 ExternalProject_Add(
+  ruby
+  DEPENDS libffi 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ruby
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ruby/configure ${PRE_FLAGS} --enable-shared
+)
+
+
+ExternalProject_Add(
   xz
   DEPENDS Python
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/xz
@@ -674,7 +682,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   webkitgtk
-  DEPENDS pygobject gperf libsoup
+  DEPENDS pygobject gperf libsoup ruby
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/webkitgtk
   CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -D PORT=GTK -D ENABLE_CREDENTIAL_STORAGE=0 -D ENABLE_GEOLOCATION=0 -D ENABLE_SPELLCHECK=0 -D USE_LIBNOTIFY=0 -D USE_LIBHYPHEN=0 -D ENABLE_WEB_AUDIO=0 -D ENABLE_VIDEO=0
 )
