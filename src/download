@@ -2,7 +2,7 @@
 
 # Author: Jaap Versteegh <j.r.versteegh@gmail.com>
 
-GNU_MIRROR=http://mirror.inode.at/gnu
+GNU_MIRROR=http://ftp.snt.utwente.nl/pub/software/gnu
 SF_HOST=http://prdownloads.sourceforge.net
 GNM_HOST=https://download.gnome.org/sources
 FD_HOST=https://www.freedesktop.org/software
@@ -199,6 +199,7 @@ url_download qt http://ftp2.nluug.nl/languages/qt/archive/qt/5.6/5.6.1-1/single/
 if [ -d qt/qtwayland ]; then rm -rf qt/qtwayland; fi
 
 url_download qt-creator http://ftp2.nluug.nl/languages/qt/official_releases/qtcreator/4.0/4.0.3/qt-creator-opensource-src-4.0.3.tar.gz
+url_download libwebp https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-0.5.1.tar.gz
 
 git_download pyside-setup git://code.qt.io/pyside/pyside-setup.git dev
 git_download qtwebkit git://code.qt.io/qt/qtwebkit.git 5.6.1

@@ -8,20 +8,24 @@ cd $curdir
 
 if [ "X$1" == "Xdownloads" ]; then
   rm -rf .downloads
+  rm -rf pyside-setup
+  rm -rf qtwebkit
 fi
 
 function gitclean() {
   name=$1
-  pushd $name
-  git clean -x -f -d
-  if [ -f .gitmodules ]; then
-    for submodule in `grep path .gitmodules | awk '{ print $3 }'`; do
-      pushd $submodule
-      git clean -x -f -d
-      popd
-    done
+  if [ -d $name ]; then
+    pushd $name
+    git clean -x -f -d
+    if [ -f .gitmodules ]; then
+      for submodule in `grep path .gitmodules | awk '{ print $3 }'`; do
+        pushd $submodule
+        git clean -x -f -d
+        popd
+      done
+    fi
+    popd
   fi
-  popd
 }
 
 rm -rf atk
