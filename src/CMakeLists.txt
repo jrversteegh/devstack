@@ -715,9 +715,8 @@ ExternalProject_Add(
   qtwebkit
   DEPENDS qt
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qtwebkit
-  CONFIGURE_COMMAND ""
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND = qmake -r CONFIG+=ordered
+  CONFIGURE_COMMAND env CONFIG=ordered qmake -r 
   #BUILD_COMMAND Tools/Scripts/build-webkit --qt --minimal CONFIG+=use_system_icu --install-headers=${CMAKE_INSTALL_PREFIX}/include --install-libs=${CMAKE_INSTALL_PREFIX}/lib --no-web-audio --no-video --no-geolocation
   INSTALL_COMMAND $(MAKE) install INSTALL_ROOT=${CMAKE_INSTALL_PREFIX}
 )
