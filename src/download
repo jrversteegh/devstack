@@ -101,6 +101,20 @@ function fd_download()
   download $name $file $url
 }
 
+function git_download()
+{
+  name=$1
+  url=$2
+  branch=$3
+  if [ -d $name ]; then
+    pushd $name
+    git pull --recurse-submodules
+    popd
+  else
+    git clone --recursive $url -b $branch  || fail "Failed to clone $name"
+  fi  
+}
+
 gnu_download gmp 6.1.0 tar.xz
 gnu_download mpfr 3.1.4 tar.xz 
 gnu_download mpc 1.0.3 tar.gz 
@@ -180,11 +194,10 @@ url_download doxygen http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.src.ta
 
 url_download webkitgtk https://webkitgtk.org/releases/webkitgtk-2.12.3.tar.xz
 url_download qt http://ftp2.nluug.nl/languages/qt/archive/qt/5.6/5.6.1-1/single/qt-everywhere-opensource-src-5.6.1-1.tar.gz 
-# We don't care about the wayland extension for now
+# We don't care about the wayland extension for now and it doesn't compile
 if [ -d qt/qtwayland ]; then rm -rf qt/qtwayland; fi
 
 url_download qt-creator http://ftp2.nluug.nl/languages/qt/official_releases/qtcreator/4.0/4.0.3/qt-creator-opensource-src-4.0.3.tar.gz
 
-if [ ! -d pyside-setup ]; then
-  git clone --recursive git://code.qt.io/pyside/pyside-setup.git || fail "Failed to get PySide from git"
-fi
+git_download pyside-setup git://code.qt.io/pyside/pyside-setup.git dev
+git_download qtwebkit git://code.qt.io/qt/qtwebkit.git 5.6.1

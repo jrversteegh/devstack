@@ -681,7 +681,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   qt
-  DEPENDS webkitgtk cmake
+  DEPENDS pygobject cmake
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -no-libinput -opensource -confirm-license -nomake examples -glib -qt-xcb
@@ -697,8 +697,15 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  qtwebkit
+  DEPENDS qt
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qtwebkit
+  CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -D PORT=QT -D ENABLE_CREDENTIAL_STORAGE=0 -D ENABLE_GEOLOCATION=0 -D ENABLE_SPELLCHECK=0 -D USE_LIBNOTIFY=0 -D USE_LIBHYPHEN=0 -D ENABLE_WEB_AUDIO=0 -D ENABLE_VIDEO=0
+)
+
+ExternalProject_Add(
   pyside
-  DEPENDS qt Python
+  DEPENDS qtwebkit
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pyside-setup
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
