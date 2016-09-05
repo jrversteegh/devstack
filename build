@@ -41,8 +41,8 @@ echo "done."
 popd >/dev/null
 
 source env.sh
-echo "PATH: $PATH"
-echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+#echo "PATH: $PATH"
+#echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
 
 test_available cmake
 
