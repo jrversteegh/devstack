@@ -113,7 +113,9 @@ function git_download()
   else
     git clone --recursive $url -b $branch  || fail "Failed to clone $name"
     patch_package $name
+    pushd $name
     git commit -a -m "local patches"
+    popd
   fi  
 }
 
