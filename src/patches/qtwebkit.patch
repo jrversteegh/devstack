@@ -1,7 +1,5 @@
-diff --git a/Source/JavaScriptCore/disassembler/udis86/ud_opcode.py b/Source/JavaScriptCore/disassembler/udis86/ud_opcode.py
-index f827380..20ecb7f 100644
---- a/Source/JavaScriptCore/disassembler/udis86/ud_opcode.py
-+++ b/Source/JavaScriptCore/disassembler/udis86/ud_opcode.py
+--- Source/JavaScriptCore/disassembler/udis86/ud_opcode.py
++++ Source/JavaScriptCore/disassembler/udis86/ud_opcode.py.patched
 @@ -115,9 +115,9 @@ class UdOpcodeTables:
              '/mod'   : lambda v: '00' if v == '!11' else '01',
              # Mode extensions:
