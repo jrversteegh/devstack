@@ -15,16 +15,16 @@ fi
 function gitclean() {
   name=$1
   if [ -d $name ]; then
-    pushd $name
+    pushd $name >/dev/null
     git clean -x -f -d
     if [ -f .gitmodules ]; then
       for submodule in `grep path .gitmodules | awk '{ print $3 }'`; do
-        pushd $submodule
+        pushd $submodule >/dev/null
         git clean -x -f -d
-        popd
+        popd >/dev/null
       done
     fi
-    popd
+    popd >/dev/null
   fi
 }
 
