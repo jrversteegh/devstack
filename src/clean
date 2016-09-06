@@ -15,13 +15,15 @@ fi
 function gitclean() {
   name=$1
   if [ -d $name ]; then
-    pushd $name >/dev/null
+    pushd $name >/dev/null || return
     git clean -x -f -d .
     if [ -f .gitmodules ]; then
       for submodule in `grep path .gitmodules | awk '{ print $3 }'`; do
-        pushd $submodule >/dev/null
-        git clean -x -f -d .
-        popd >/dev/null
+        if [ -d $submodule ]; then
+          pushd $submodule >/dev/null || return
+          git clean -x -f -d .
+          popd >/dev/null
+        fi
       done
     fi
     popd >/dev/null
@@ -106,5 +108,5 @@ rm -rf webkitgtk
 gitclean pyside-setup
 gitclean qtwebkit
 gitclean pycairo
-gitclean Boost.Numpy
+gitclean Boost.NumPy
 
