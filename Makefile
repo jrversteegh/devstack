@@ -4,13 +4,15 @@ all:
 clean:
 	./clean
 
-cleanroot:
-	./clean root
+cleantarget:
+	./clean target
 
 cleandownloads:
 	./clean downloads
 
 cleanall:
 	./clean all
+
+distclean: cleanall
 	
-.PHONY: all clean cleanroot cleandownloads cleanall
+.PHONY: all clean cleantarget cleandownloads cleanall distclean
