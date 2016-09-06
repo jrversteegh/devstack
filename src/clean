@@ -16,11 +16,11 @@ function gitclean() {
   name=$1
   if [ -d $name ]; then
     pushd $name >/dev/null
-    git clean -x -f -d
+    git clean -x -f -d .
     if [ -f .gitmodules ]; then
       for submodule in `grep path .gitmodules | awk '{ print $3 }'`; do
         pushd $submodule >/dev/null
-        git clean -x -f -d
+        git clean -x -f -d .
         popd >/dev/null
       done
     fi
@@ -34,8 +34,6 @@ rm -rf autogen
 rm -rf automake
 rm -rf bison
 rm -rf boost
-rm -rf Boost.Numpy/CMakeCache.txt
-rm -rf Boost.Numpy/CMakeFiles
 rm -rf bzip2
 rm -rf cairo
 rm -rf cmake
@@ -77,7 +75,6 @@ rm -rf pango
 rm -rf pcre
 rm -rf perl
 rm -rf pixman
-rm -rf pycairo/build_directory
 rm -rf pygobject
 rm -rf Python
 rm -rf swig
@@ -108,4 +105,6 @@ rm -rf webkitgtk
 
 gitclean pyside-setup
 gitclean qtwebkit
+gitclean pycairo
+gitclean Boost.Numpy
 
