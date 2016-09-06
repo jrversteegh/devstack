@@ -96,6 +96,15 @@ rm -rf qt
 rm -rf qtbase
 rm -rf qt-creator
 rm -rf doxygen
+rm -rf glib-networking
+rm -rf gnutls
+rm -rf gperf
+rm -rf libsoup
+rm -rf libwebp
+rm -rf nettle
+rm -rf ruby
+rm -rf vala
+rm -rf webkitgtk
 
 gitclean pyside-setup
 gitclean qtwebkit
