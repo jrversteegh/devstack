@@ -57,7 +57,7 @@ else()
   set(OPENCL_FLAGS "")
 endif()
 
-# OpenGL (ES) headers for cairo and qt
+# OpenGL (ES) headers for cairo, qt and webkitgtk
 if(HAVE_GLES2_INC)
   set(CAIRO_GL_FLAGS --enable-glesv2=yes)
   set(QT_GL_FLAGS -opengl es2)

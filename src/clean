@@ -104,6 +104,8 @@ rm -rf nettle
 rm -rf ruby
 rm -rf vala
 rm -rf webkitgtk
+rm -rf tcl
+rm -rf tk
 
 gitclean pyside-setup
 gitclean qtwebkit
