@@ -317,10 +317,30 @@ ExternalProject_Add_Step(
   COMMAND cd ${CMAKE_INSTALL_PREFIX}/lib && ln -sf libopenblas.so libblas.so && ln -sf libopenblas.so liblapack.so && ln -sf libopenblas.so libatlas.so
 )
 
-# The python interpreter. Get that up soon
+ExternalProject_Add(
+  ruby
+  DEPENDS libffi 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ruby
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ruby/configure ${PRE_FLAGS} --enable-shared
+)
+
+ExternalProject_Add(
+  tcl
+  DEPENDS libffi 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tcl
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tcl/unix/configure ${PRE_FLAGS} --enable-64bit
+)
+
+ExternalProject_Add(
+  tk
+  DEPENDS tcl 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tk
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tk/unix/configure ${PRE_FLAGS}
+)
+
 ExternalProject_Add(
   Python
-  DEPENDS libffi 
+  DEPENDS tk 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Python
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared --with-ensurepip --with-gcc=${CMAKE_INSTALL_PREFIX}/bin/gcc
 )
@@ -331,14 +351,6 @@ ExternalProject_Add_Step(
   DEPENDEES install
   COMMAND cd ${CMAKE_INSTALL_PREFIX}/bin && ln -sf python3 python && ln -sf python3-config python-config && ln -sf pip3 pip
 )
-
-ExternalProject_Add(
-  ruby
-  DEPENDS libffi 
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ruby
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ruby/configure ${PRE_FLAGS} --enable-shared
-)
-
 
 ExternalProject_Add(
   xz
@@ -559,7 +571,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   python_modules
-  DEPENDS Python gtk+
+  DEPENDS Python gtk+ tk
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/python_modules
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
@@ -727,3 +739,5 @@ ExternalProject_Add(
   BUILD_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py build
   INSTALL_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py install
 )
+
+Exter

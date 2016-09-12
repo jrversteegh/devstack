@@ -34,6 +34,7 @@ function download()
   unp4=`basename $file .tgz`
   # patch level 1 (qt)
   unpp=`basename $file "-1.tar.gz"`
+  unps=`basename $file "-src.tar.gz"`
   if [ -d $name ]; then
     return 0
   fi
@@ -42,9 +43,10 @@ function download()
     pushd .downloads && wget --no-check-certificate $url && popd || fail "Failed to get $name"
   fi
   tar xf .downloads/$file && \
-    if [ ! -d $name ]; then mv $name-* $name || mv "$name"_* $name || mv "$name"src* $name || \
+    if [ ! -d $name ]; then 
+      mv $name-* $name || mv "$name"_* $name || mv "$name"src* $name || \
       mv "$unp1" "$name" || mv "$unp2" "$name" || mv "$unp3" "$name" || mv "$unp4" "$name" || \
-      mv "$unpp" "$name"; fi || \
+      mv "$unpp" "$name" || mv "$unps" "$name"; fi || \
     fail "Failed to unpack $name"
   patch_package $name
 }
@@ -167,6 +169,8 @@ sf_download flex 2.6.0 tar.xz
 sf_download cppunit 1.12.1 tar.gz
 sf_download swig 3.0.8 tar.gz
 sf_download freetype 2.6.3 tar.gz
+url_download tcl http://prdownloads.sourceforge.net/tcl/tcl8.6.6-src.tar.gz
+url_download tk http://prdownloads.sourceforge.net/tcl/tk8.6.6-src.tar.gz
 
 fd_download fontconfig 2.11.95
 fd_download harfbuzz 1.2.7
