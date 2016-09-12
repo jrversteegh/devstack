@@ -408,7 +408,7 @@ ExternalProject_Add(
   DEPENDS nettle
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gnutls
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-default-trust-store-file=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt --with-included-libtasn1 --without-p11-kit
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-default-trust-store-file=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt --with-included-libtasn1 --without-p11-kit --with-guile-site-dir=${CMAKE_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(
