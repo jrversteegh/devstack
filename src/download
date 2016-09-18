@@ -154,7 +154,7 @@ url_download openssl https://www.openssl.org/source/openssl-1.0.2h.tar.gz
 url_download Python https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tar.xz
 url_download ruby https://cache.ruby-lang.org/pub/ruby/2.3/ruby-2.3.1.tar.gz
 url_download xz http://tukaani.org/xz/xz-5.2.2.tar.xz
-url_download tiff ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.6.tar.gz
+url_download tiff http://download.osgeo.org/libtiff/tiff-4.0.6.tar.gz
 url_download libxml2 ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz
 url_download libxslt ftp://xmlsoft.org/libxml2/libxslt-1.1.29.tar.gz
 url_download openmpi https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.bz2
