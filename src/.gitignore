@@ -79,3 +79,5 @@
 /libwebp
 /tcl
 /tk
+/sqlite
+/postgresql

@@ -320,6 +320,7 @@ ExternalProject_Add_Step(
   COMMAND cd ${CMAKE_INSTALL_PREFIX}/lib && ln -sf libopenblas.so libblas.so && ln -sf libopenblas.so liblapack.so && ln -sf libopenblas.so libatlas.so
 )
 
+
 ExternalProject_Add(
   ruby
   DEPENDS libffi 
@@ -383,6 +384,20 @@ ExternalProject_Add(
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libxslt
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libxslt/configure ${PRE_FLAGS}
   INSTALL_COMMAND $(MAKE) install 
+)
+
+ExternalProject_Add(
+  sqlite
+  DEPENDS libxml2
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sqlite
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/sqlite/configure ${PRE_FLAGS} CFLAGS=-DSQLITE_ENABLE_COLUMN_METADATA
+)
+
+ExternalProject_Add(
+  postgresql
+  DEPENDS libxslt
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/postgresql
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/postgresql/configure ${PRE_FLAGS} --with-tcl --with-perl --with-python --with-xml --with-xslt --with-openssl
 )
 
 ExternalProject_Add(
@@ -574,7 +589,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   python_modules
-  DEPENDS Python gtk+ tk
+  DEPENDS Python gtk+ tk postgresql
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/python_modules
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ""
@@ -703,14 +718,14 @@ ExternalProject_add(
 
 ExternalProject_Add(
   webkitgtk
-  DEPENDS libwebp gperf libsoup ruby
+  DEPENDS libwebp gperf libsoup ruby sqlite
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/webkitgtk
   CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -D CMAKE_BUILD_TYPE=Release -D PORT=GTK -D ENABLE_CREDENTIAL_STORAGE=0 -D ENABLE_GEOLOCATION=0 -D ENABLE_SPELLCHECK=0 -D USE_LIBNOTIFY=0 -D USE_LIBHYPHEN=0 -D ENABLE_WEB_AUDIO=0 -D ENABLE_VIDEO=0 -D ENABLE_PLUGIN_PROCESS_GTK2=0 -D PYTHON_EXECUTABLE=${CMAKE_INSTALL_PREFIX}/bin/python ${WEBKITGKT_GL_FLAGS}
 )
 
 ExternalProject_Add(
   qt
-  DEPENDS pygobject cmake
+  DEPENDS pygobject cmake sqlite
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -no-libinput -opensource -confirm-license -nomake examples -glib -qt-xcb
