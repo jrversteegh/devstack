@@ -29,10 +29,13 @@ fi
 export DEVSTACK_TARGET
 echo "Building to: $DEVSTACK_TARGET"
 
+scripts/install_prerequisits
 test_available gzip
 test_available bzip2
 test_available xz
 test_available wget
+test_available m4
+test_available g++
 
 pushd src >/dev/null
 echo -n "Downloading... "
