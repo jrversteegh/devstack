@@ -7,4 +7,5 @@ pip install scipy && \
 pip install matplotlib && \
 pip install ipython && \
 pip install cairocffi && \
-pip install pybind11
+pip install pybind11 && \
+pip install psycopg2

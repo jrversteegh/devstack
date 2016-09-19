@@ -17,6 +17,7 @@ set(BOOST_LDFLAGS -L${CMAKE_INSTALL_PREFIX}/lib)
 check_include_files(CL/opencl.h HAVE_OPENCL_INC)
 check_include_files(GL/gl.h HAVE_OPENGL_INC)
 check_include_files(GLES2/gl2.h HAVE_GLES2_INC)
+check_include_files(readline/readline.h HAVE_READ_LINE)
 check_c_source_compiles(
 "
 #include <X11/Xlib.h>
@@ -70,6 +71,12 @@ else()
   set(CAIRO_GL_FLAGS "")
   set(QT_GL_FLAGS "")
   set(WEBKITGKT_GL_FLAGS -D ENABLE_OPENGL=0)
+endif()
+
+if(HAVE_READ_LINE)
+  set(PG_READ_LINE_FLAGS --with-readline)
+else()
+  set(PG_READ_LINE_FLAGS --without-readline)
 endif()
 
 # First build gcc 
@@ -397,7 +404,7 @@ ExternalProject_Add(
   postgresql
   DEPENDS libxslt
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/postgresql
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/postgresql/configure ${PRE_FLAGS} --with-tcl --with-perl --with-python --with-xml --with-xslt --with-openssl
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/postgresql/configure ${PRE_FLAGS} ${PG_READ_LINE_FLAGS} --with-tcl --with-perl --with-python --with-xml --with-xslt --with-openssl
 )
 
 ExternalProject_Add(
@@ -725,7 +732,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   qt
-  DEPENDS pygobject cmake sqlite
+  DEPENDS pygobject cmake sqlite postgresql
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -no-libinput -opensource -confirm-license -nomake examples -glib -qt-xcb
