@@ -1,3 +1,0 @@
-#!/bin/sh
-
-[ -z `which apt-get` ] || sudo apt-get install xz-utils gzip bzip2 wget g++ cmake m4 libX11-dev libxi-dev libxrandr-dev libxext-dev docbook-xsl libreadline6-dev 
