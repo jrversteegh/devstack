@@ -131,7 +131,7 @@ gnu_download gdb 7.11.1 tar.xz
 gnu_download libtool 2.4.6 tar.xz 
 gnu_download libunistring 0.9.6 tar.xz
 url_download libatomic_ops http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.4.2.tar.gz
-url_download gc http://www.hboehm.info/gc/gc_source/gc-7.4.2.tar.gz
+url_download gc http://www.hboehm.info/gc/gc_source/gc-7.6.0.tar.gz
 gnu_download guile 2.0.9 tar.xz
 gnu_download autogen 5.18.9 tar.xz rel5.18.9
 gnu_download autoconf 2.69 tar.xz 
