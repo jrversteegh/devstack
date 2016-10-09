@@ -213,3 +213,4 @@ url_download libwebp https://storage.googleapis.com/downloads.webmproject.org/re
 
 git_download pyside-setup git://code.qt.io/pyside/pyside-setup.git dev
 git_download qtwebkit git://code.qt.io/qt/qtwebkit.git 5.6.1
+git_download flexx git@github.com:jrversteegh/flexx.git master

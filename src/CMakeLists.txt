@@ -765,3 +765,14 @@ ExternalProject_Add(
   INSTALL_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py install
 )
 
+
+ExternalProject_Add(
+  flexx
+  DEPENDS pyside
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flexx
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py build
+  INSTALL_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py install
+)
+
