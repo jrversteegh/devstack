@@ -452,7 +452,7 @@ ExternalProject_Add(
   curl
   DEPENDS gnutls
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/curl
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX} --with-ca-path=${CMAKE_INSTALL_PREFIX}/etc/ssl/certs --with-ca-bundle=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt
 )
 
 ExternalProject_Add(
@@ -460,6 +460,13 @@ ExternalProject_Add(
   DEPENDS curl
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add_Step(
+  wget
+  after_install
+  DEPENDEES install
+  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/certs_install
 )
 
 ExternalProject_Add(
