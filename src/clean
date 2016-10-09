@@ -111,4 +111,5 @@ gitclean pyside-setup
 gitclean qtwebkit
 gitclean pycairo
 gitclean Boost.NumPy
+gitclean flexx
 
