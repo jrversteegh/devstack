@@ -1,0 +1,112 @@
+--- Source/JavaScriptCore/generate-bytecode-files.orig	2016-10-09 15:14:44.629777184 +0200
++++ Source/JavaScriptCore/generate-bytecode-files	2016-10-10 23:36:13.061548757 +0200
+@@ -1,4 +1,4 @@
+-#! /usr/bin/python
++#! /usr/bin/env python
+ 
+ # Copyright (C) 2014 Apple Inc. All rights reserved.
+ #
+@@ -25,6 +25,7 @@
+ 
+ # This tool processes the bytecode list to create Bytecodes.h and InitBytecodes.asm
+ 
++from __future__ import print_function
+ import hashlib
+ import json
+ import optparse
+@@ -91,14 +92,14 @@
+     try:
+         return open(path, mode)
+     except IOError as e:
+-        print "I/O error opening {0}, ({1}): {2}".format(path, e.errno, e.strerror)
++        print("I/O error opening {0}, ({1}): {2}".format(path, e.errno, e.strerror))
+         exit(1)
+ 
+ def hashFile(file):
+     sha1 = hashlib.sha1()
+     file.seek(0)
+     for line in file:
+-        sha1.update(line)
++        sha1.update(line.encode('utf-8'))
+ 
+     file.seek(0)
+ 
+@@ -114,7 +115,7 @@
+         parser.error("missing <bytecode-json-file>")
+ 
+     bytecodeJSONFile = args[0]
+-    bytecodeFile = openOrExit(bytecodeJSONFile, "rb")
++    bytecodeFile = openOrExit(bytecodeJSONFile, "r")
+     sha1Hash = hashFile(bytecodeFile)
+ 
+     hFileHashString = "// SHA1Hash: {0}\n".format(sha1Hash)
+@@ -163,24 +164,24 @@
+         initBytecodesFile = openOrExit(initASMFileName, "wb")
+ 
+     try:
+-        bytecodeSections = json.load(bytecodeFile, encoding = "utf-8")
++        bytecodeSections = json.load(bytecodeFile)
+     except:
+-        print "Unexpected error parsing {0}: {1}".format(bytecodeJSONFile, sys.exc_info())
++        print("Unexpected error parsing {0}: {1}".format(bytecodeJSONFile, sys.exc_info()))
+ 
+     if bytecodeHFilename:
+-        bytecodeHFile.write(hFileHashString)
+-        bytecodeHFile.write(cCopyrightMsg % bytecodeJSONFile)
+-        bytecodeHFile.write("#ifndef Bytecodes_h\n")
+-        bytecodeHFile.write("#define Bytecodes_h\n\n")
++        bytecodeHFile.write(hFileHashString.encode('utf-8'))
++        bytecodeHFile.write((cCopyrightMsg % bytecodeJSONFile).encode('utf-8'))
++        bytecodeHFile.write(b"#ifndef Bytecodes_h\n")
++        bytecodeHFile.write(b"#define Bytecodes_h\n\n")
+ 
+     if initASMFileName:
+-        initBytecodesFile.write(asmFileHashString)
+-        initBytecodesFile.write(asmCopyrightMsg % bytecodeJSONFile)
++        initBytecodesFile.write(asmFileHashString.encode('utf-8'))
++        initBytecodesFile.write((asmCopyrightMsg % bytecodeJSONFile).encode('utf-8'))
+         initASMBytecodeNum = 0
+ 
+     for section in bytecodeSections:
+         if bytecodeHFilename and section['emitInHFile']:
+-            bytecodeHFile.write("#define FOR_EACH_{0}_ID(macro) \\\n".format(section["macroNameComponent"]))
++            bytecodeHFile.write(("#define FOR_EACH_{0}_ID(macro) \\\n".format(section["macroNameComponent"])).encode('utf-8'))
+             firstMacro = True
+             defaultLength = 1
+             if "defaultLength" in section:
+@@ -189,29 +190,29 @@
+             bytecodeNum = 0
+             for bytecode in section["bytecodes"]:
+                 if not firstMacro:
+-                    bytecodeHFile.write(" \\\n")
++                    bytecodeHFile.write(b" \\\n")
+ 
+                 length = defaultLength
+                 if "length" in bytecode:
+                     length = bytecode["length"]
+ 
+-                bytecodeHFile.write("    macro({0}, {1})".format(bytecode["name"], length))
++                bytecodeHFile.write(("    macro({0}, {1})".format(bytecode["name"], length)).encode('utf-8'))
+                 firstMacro = False
+                 bytecodeNum = bytecodeNum + 1
+ 
+-            bytecodeHFile.write("\n\n")
+-            bytecodeHFile.write("#define NUMBER_OF_{0}_IDS {1}\n\n".format(section["macroNameComponent"], bytecodeNum))
++            bytecodeHFile.write(b"\n\n")
++            bytecodeHFile.write(("#define NUMBER_OF_{0}_IDS {1}\n\n".format(section["macroNameComponent"], bytecodeNum)).encode('utf-8'))
+ 
+         if initASMFileName and section['emitInASMFile']:
+             prefix = ""
+             if "asmPrefix" in section:
+                 prefix = section["asmPrefix"]
+             for bytecode in section["bytecodes"]:
+-                initBytecodesFile.write("setEntryAddress({0}, _{1}{2})\n".format(initASMBytecodeNum, prefix, bytecode["name"]))
++                initBytecodesFile.write(("setEntryAddress({0}, _{1}{2})\n".format(initASMBytecodeNum, prefix, bytecode["name"])).encode('utf-8'))
+                 initASMBytecodeNum = initASMBytecodeNum + 1
+ 
+     if bytecodeHFilename:
+-        bytecodeHFile.write("#endif // Bytecodes_h\n")
++        bytecodeHFile.write(b"#endif // Bytecodes_h\n")
+         bytecodeHFile.close()
+ 
+     if initASMFileName:
