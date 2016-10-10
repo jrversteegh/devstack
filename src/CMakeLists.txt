@@ -30,12 +30,13 @@ HAVE_X_INC
 )
 
 if (HAVE_OPENGL_INC) 
-  set(CMAKE_REQUIRED_LIBRARIES -lGL)
+  set(CMAKE_REQUIRED_LIBRARIES "-lGL")
   check_c_source_compiles("#include <GL/gl.h>
   int main() { return 0; }
   " 
   HAVE_OPENGL_LIB
   )
+  set(CMAKE_REQUIRED_LIBRARIES "")
 endif()
 
 if(HAVE_OPENGL_INC) 
@@ -466,7 +467,7 @@ ExternalProject_Add_Step(
   wget
   after_install
   DEPENDEES install
-  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/certs_install
+  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/certs_install
 )
 
 ExternalProject_Add(
