@@ -203,7 +203,7 @@ url_download git https://www.kernel.org/pub/software/scm/git/git-2.9.0.tar.xz
 url_download doxygen http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.src.tar.gz
 url_download postgresql https://ftp.postgresql.org/pub/source/v9.5.4/postgresql-9.5.4.tar.bz2
 
-url_download webkitgtk https://webkitgtk.org/releases/webkitgtk-2.12.3.tar.xz
+url_download webkitgtk https://webkitgtk.org/releases/webkitgtk-2.14.0.tar.xz
 url_download qt http://ftp2.nluug.nl/languages/qt/archive/qt/5.6/5.6.1-1/single/qt-everywhere-opensource-src-5.6.1-1.tar.gz 
 # We don't care about the wayland extension for now and it doesn't compile
 if [ -d qt/qtwayland ]; then rm -rf qt/qtwayland; fi
