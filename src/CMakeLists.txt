@@ -743,7 +743,7 @@ ExternalProject_Add(
   DEPENDS pygobject cmake sqlite postgresql
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/qt
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-nis -no-openvg -no-pch -no-libinput -opensource -confirm-license -nomake examples -glib -qt-xcb
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} ${QT_GL_FLAGS} -no-openvg -no-pch -no-libinput -opensource -confirm-license -nomake examples -glib -qt-xcb
 )
 
 ExternalProject_Add(
@@ -784,3 +784,22 @@ ExternalProject_Add(
   INSTALL_COMMAND ${CMAKE_INSTALL_PREFIX}/bin/python setup.py install
 )
 
+# Some useful libraries
+ExternalProject_Add(
+  geos
+  DEPENDS json-c Python
+)
+
+ExternalProject_Add(
+  libgdal
+  DEPENDS geos
+)
+
+ExternalProject_add(
+  proj
+  DEPENDS geos
+)
+
+ExternalProject_Add(
+  CGAL
+)
