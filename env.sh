@@ -17,6 +17,7 @@ libdir=$DEVSTACK_TARGET/lib
 sharedir=$DEVSTACK_TARGET/share
 if [ -z $USING_DEVSTACK ]; then
   export USING_DEVSTACK=1
+  export PREFIX="$DEVSTACK_TARGET"
   export PATH=$bindir:$PATH
   if [ -z $LD_LIBRARY_PATH ]; then
     export LD_LIBRARY_PATH=$libdir
