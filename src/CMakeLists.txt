@@ -788,18 +788,29 @@ ExternalProject_Add(
 ExternalProject_Add(
   geos
   DEPENDS json-c Python
-)
-
-ExternalProject_Add(
-  libgdal
-  DEPENDS geos
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/geos
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/geos/configure ${PRE_FLAGS}
 )
 
 ExternalProject_add(
   proj
   DEPENDS geos
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proj
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/proj/configure ${PRE_FLAGS}
 )
 
 ExternalProject_Add(
+  gdal
+  DEPENDS geos pcre curl expat libpng
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdal
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX}/bin/python ${OPENCL_FLAGS} --with-png=${CMAKE_INSTALL_PREFIX} --with-expat=${CMAKE_INSTALL_PREFIX} --with-libjson-c=${CMAKE_INSTALL_PREFIX} --with-curl=${CMAKE_INSTALL_PREFIX} --with-geos=yes --with-pcre LDFLAGS=$(LDFLAGS) 
+)
+
+
+ExternalProject_Add(
   CGAL
+  DEPENDS qt
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CGAL
+  CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 )
