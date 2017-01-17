@@ -77,10 +77,11 @@ function gnu_download()
 function sf_download()
 {
   name=$1
+  dname=${1,,}
   version=$2
   ext=$3
   file=$name-$version.$ext
-  url=$SF_HOST/$name/$file
+  url=$SF_HOST/$dname/$file
   download $name $file $url
 }
   
@@ -220,3 +221,4 @@ url_download proj http://download.osgeo.org/proj/proj-4.9.3.tar.gz
 url_download gdal http://download.osgeo.org/gdal/2.1.2/gdal-2.1.2.tar.xz
 
 url_download CGAL https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.9/CGAL-4.9.tar.xz
+sf_download GeographicLib 1.46 tar.gz distrib

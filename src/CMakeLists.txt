@@ -792,6 +792,13 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/geos/configure ${PRE_FLAGS}
 )
 
+ExternalProject_Add(
+  GeographicLib
+  DEPENDS geos
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/GeographicLib
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/GeographicLib/configure ${PRE_FLAGS}
+)
+
 ExternalProject_add(
   proj
   DEPENDS geos
