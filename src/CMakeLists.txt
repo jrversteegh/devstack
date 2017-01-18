@@ -408,6 +408,7 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/postgresql/configure ${PRE_FLAGS} ${PG_READ_LINE_FLAGS} --with-tcl --with-perl --with-python --with-xml --with-xslt --with-openssl
 )
 
+
 ExternalProject_Add(
   openmpi
   DEPENDS Python
@@ -820,4 +821,12 @@ ExternalProject_Add(
   DEPENDS qt
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CGAL
   CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  postgis
+  DEPENDS postgresql gdal
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/postgis
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} 
 )

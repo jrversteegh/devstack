@@ -222,3 +222,4 @@ url_download gdal http://download.osgeo.org/gdal/2.1.2/gdal-2.1.2.tar.xz
 
 url_download CGAL https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.9/CGAL-4.9.tar.xz
 sf_download GeographicLib 1.46 tar.gz distrib
+url_download postgis http://download.osgeo.org/postgis/source/postgis-2.3.1.tar.gz
