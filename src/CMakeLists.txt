@@ -830,3 +830,12 @@ ExternalProject_Add(
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} 
 )
+
+# Mapnik is a pain to build (Stupid SConstruct)
+#ExternalProject_add(
+#  mapnik
+#  DEPENDS proj
+#  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mapnik
+#  BUILD_IN_SOURCE 1
+#  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+#)
