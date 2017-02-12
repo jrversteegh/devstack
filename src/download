@@ -125,7 +125,7 @@ function git_download()
 gnu_download gmp 6.1.0 tar.xz
 gnu_download mpfr 3.1.4 tar.xz 
 gnu_download mpc 1.0.3 tar.gz 
-gnu_download gcc 6.2.0 tar.gz gcc-6.2.0
+gnu_download gcc 6.3.0 tar.gz gcc-6.3.0
 url_download perl http://www.cpan.org/src/5.0/perl-5.24.0.tar.gz
 gnu_download texinfo 6.1 tar.xz
 gnu_download gdb 7.11.1 tar.xz
@@ -152,7 +152,7 @@ url_download OpenBLAS http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz
 url_download fam ftp://oss.sgi.com/projects/fam/download/stable/fam-2.7.0.tar.gz 
 chmod -R u+w fam
 url_download openssl https://www.openssl.org/source/openssl-1.0.2h.tar.gz
-url_download Python https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tar.xz
+url_download Python https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz
 url_download ruby https://cache.ruby-lang.org/pub/ruby/2.3/ruby-2.3.1.tar.gz
 url_download xz http://tukaani.org/xz/xz-5.2.2.tar.xz
 url_download tiff http://download.osgeo.org/libtiff/tiff-4.0.6.tar.gz
