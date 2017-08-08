@@ -123,17 +123,10 @@ function git_download()
 }
 
 gnu_download gmp 6.1.2 tar.xz
-<<<<<<< 1c410d2047ace3112fdf7059f1a61371dcea81bb
-gnu_download mpfr 3.1.5 tar.xz
-gnu_download mpc 1.0.3 tar.gz
-gnu_download gcc 6.3.0 tar.gz gcc-6.3.0
-url_download perl http://www.cpan.org/src/5.0/perl-5.24.0.tar.gz
-=======
 gnu_download mpfr 3.1.5 tar.xz 
 gnu_download mpc 1.0.3 tar.gz 
 gnu_download gcc 6.4.0 tar.gz gcc-6.4.0
 url_download perl http://www.cpan.org/src/5.0/perl-5.27.2.tar.gz
->>>>>>> Added matplotlib and upped some versions
 gnu_download texinfo 6.1 tar.xz
 gnu_download gdb 7.11.1 tar.xz
 gnu_download libtool 2.4.6 tar.xz 
