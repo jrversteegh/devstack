@@ -126,7 +126,7 @@ gnu_download gmp 6.1.2 tar.xz
 gnu_download mpfr 3.1.5 tar.xz 
 gnu_download mpc 1.0.3 tar.gz 
 gnu_download gcc 6.4.0 tar.gz gcc-6.4.0
-url_download perl http://www.cpan.org/src/5.0/perl-5.27.2.tar.gz
+url_download perl http://www.cpan.org/src/5.0/perl-5.26.0.tar.gz
 gnu_download texinfo 6.1 tar.xz
 gnu_download gdb 7.11.1 tar.xz
 gnu_download libtool 2.4.6 tar.xz 
