@@ -700,7 +700,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   itstool
-  DEPENDS intltool
+  DEPENDS intltool libxml2
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/itstool
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/itstool/configure ${PRE_FLAGS}
 )
