@@ -199,7 +199,7 @@ gnu_download nettle 3.2 tar.gz
 url_download gnutls ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/gnutls-3.5.1.tar.xz
 gnu_download wget 1.18 tar.xz
 sf_download asciidoc 8.6.9 tar.gz
-url_download xmlto https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.28.tar.gz
+url_download xmlto https://releases.pagure.org/xmlto/xmlto-0.0.28.tar.bz2
 url_download git https://www.kernel.org/pub/software/scm/git/git-2.9.0.tar.xz
 url_download doxygen http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.src.tar.gz
 url_download postgresql https://ftp.postgresql.org/pub/source/v9.5.4/postgresql-9.5.4.tar.bz2
