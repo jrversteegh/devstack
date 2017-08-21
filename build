@@ -97,8 +97,12 @@ echo -n "Running cmake stage 2... "
 cmake ../src -DCMAKE_INSTALL_PREFIX="$DEVSTACK_TARGET" >../build-2.log 2>&1 || fail "Failed to run cmake: stage 2"
 echo "done."
 # ... and go again with full build
-echo -n "Running make world... "
-make -j $CORES  >>../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
+if [ -z $1 ]; then
+  echo -n "Running make world... "
+else
+  echo -n "Running make $1... "
+fi
+make -j $CORES  $1 >>../build-2.log 2>&1 || fail "Failed to complete make: stage 2"
 echo "done."
 popd >/dev/null
 echo "Finished!"

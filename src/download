@@ -138,6 +138,11 @@ gnu_download autogen 5.18.9 tar.xz rel5.18.9
 gnu_download autoconf 2.69 tar.xz 
 gnu_download automake 1.15 tar.xz
 gnu_download gperf 3.0.4 tar.gz
+url_download llvm http://releases.llvm.org/4.0.1/llvm-4.0.1.src.tar.xz
+url_download llvm/tools/clang http://releases.llvm.org/4.0.1/cfe-4.0.1.src.tar.xz
+url_download llvm/projects/libcxx http://releases.llvm.org/4.0.1/libcxx-4.0.1.src.tar.xz
+url_download llvm/projects/libcxxabi http://releases.llvm.org/4.0.1/libcxxabi-4.0.1.src.tar.xz
+url_download llvm/projects/openmp http://releases.llvm.org/4.0.1/openmp-4.0.1.src.tar.xz
 
 url_download zlib http://zlib.net/zlib-1.2.11.tar.gz
 url_download bzip2 http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
