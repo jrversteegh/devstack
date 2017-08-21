@@ -111,7 +111,7 @@ function git_download()
   branch=$3
   if [ -d $name ]; then
     pushd $name
-    git pull --recurse-submodules
+    git pull --recurse-submodules || fail "Failed to pull $name"
     popd
   else
     git clone --recursive $url -b $branch  || fail "Failed to clone $name"
