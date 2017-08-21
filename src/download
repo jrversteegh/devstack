@@ -211,11 +211,11 @@ url_download doxygen http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.src.ta
 url_download postgresql https://ftp.postgresql.org/pub/source/v9.5.4/postgresql-9.5.4.tar.bz2
 
 url_download webkitgtk https://webkitgtk.org/releases/webkitgtk-2.14.0.tar.xz
-url_download qt http://ftp2.nluug.nl/languages/qt/archive/qt/5.9/5.9.1/single/qt-everywhere-opensource-src-5.9.1.tar.gz
+url_download qt http://ftp2.nluug.nl/languages/qt/archive/qt/5.9/5.9.1/single/qt-everywhere-opensource-src-5.9.1.tar.xz
 # We don't care about the wayland extension for now and it doesn't compile
 if [ -d qt/qtwayland ]; then rm -rf qt/qtwayland; fi
 
-url_download qt-creator http://ftp2.nluug.nl/languages/qt/official_releases/qtcreator/4.3/4.3.1/qt-creator-opensource-src-4.3.1.tar.gz
+url_download qt-creator http://ftp2.nluug.nl/languages/qt/official_releases/qtcreator/4.3/4.3.1/qt-creator-opensource-src-4.3.1.tar.xz
 url_download libwebp https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-0.5.1.tar.gz
 
 git_download pyside-setup git://code.qt.io/pyside/pyside-setup.git 5.9
