@@ -111,6 +111,7 @@ function git_download()
   branch=$3
   if [ -d $name ]; then
     pushd $name
+    git checkout $branch || fail "Failed to checkout $branch"
     git pull --recurse-submodules || fail "Failed to pull $name"
     popd
   else
