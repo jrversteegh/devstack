@@ -24,7 +24,13 @@ curdir=`dirname $curfile`
 cd $curdir
 
 if [ -z "$DEVSTACK_TARGET" ]; then
-  DEVSTACK_TARGET=$curdir/root
+  if [ -f .target ]; then
+    DEVSTACK_TARGET=`cat .target`
+  else
+    DEVSTACK_TARGET=$curdir/root
+  fi
+else
+  echo "$DEVSTACK_TARGET" > .target
 fi
 export DEVSTACK_TARGET
 echo "Building to: $DEVSTACK_TARGET"
