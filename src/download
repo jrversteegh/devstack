@@ -113,7 +113,9 @@ function git_download()
     pushd $name
     git checkout $branch --force || fail "Failed to checkout $branch"
     git submodule update --init --recursive || fail "Failed to update submodules of $name"
-    git pull --recurse-submodules || fail "Failed to pull $name"
+    git pull --rebase --recurse-submodules || fail "Failed to pull $name"
+    git clean -dxf
+    git submodule foreach 'git clean -dxf'
     popd
   else
     git clone --recursive $url -b $branch  || fail "Failed to clone $name"
