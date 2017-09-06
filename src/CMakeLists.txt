@@ -826,8 +826,14 @@ ExternalProject_add(
 )
 
 ExternalProject_Add(
+  jasper
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/jasper
+  CONFIGURE_COMMAND  ${CMAKE_CURRENT_SOURCE_DIR}/jasper/configure ${PRE_FLAGS} --enable-shared=yes 
+)
+
+ExternalProject_Add(
   gdal
-  DEPENDS geos pcre curl expat libpng
+  DEPENDS geos pcre curl expat libpng jasper
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdal
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX}/bin/python ${OPENCL_FLAGS} --with-png=${CMAKE_INSTALL_PREFIX} --with-expat=${CMAKE_INSTALL_PREFIX} --with-libjson-c=${CMAKE_INSTALL_PREFIX} --with-curl=${CMAKE_INSTALL_PREFIX} --with-geos=yes --with-pcre LDFLAGS=$(LDFLAGS) 
