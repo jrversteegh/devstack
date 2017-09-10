@@ -828,7 +828,7 @@ ExternalProject_add(
 ExternalProject_Add(
   jasper
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/jasper
-  CONFIGURE_COMMAND  ${CMAKE_CURRENT_SOURCE_DIR}/jasper/configure ${PRE_FLAGS} --enable-shared=yes 
+  CMAKE_ARGS ${CMAKE_FLAGS} -DCMAKE_SKIP_INSTALL_RPATH=YES
 )
 
 ExternalProject_Add(

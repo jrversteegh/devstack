@@ -172,7 +172,7 @@ url_download boost http://prdownloads.sourceforge.net/boost/boost_1_63_0.tar.bz2
 if [ -d boost_1_63_0 ]; then mv boost_* boost; fi
 url_download libarchive http://libarchive.org/downloads/libarchive-3.2.0.tar.gz
 url_download curl https://curl.haxx.se/download/curl-7.49.1.tar.bz2
-url_download cmake https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz
+url_download cmake https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
 gnu_download gettext 0.19.7 tar.xz
 gnu_download bison 3.0.4 tar.xz
 sf_download flex 2.6.0 tar.xz
