@@ -25,6 +25,7 @@ if [ "X$1" == "Xall" ]; then
 fi
 
 rm -rf .build
+rm -rf .target
 rm -f build-1.log
 rm -f build-2.log
 rm -f download.log

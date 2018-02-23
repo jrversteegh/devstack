@@ -27,7 +27,7 @@ if [ -z "$DEVSTACK_TARGET" ]; then
   if [ -f .target ]; then
     DEVSTACK_TARGET=`cat .target`
   else
-    DEVSTACK_TARGET=$curdir/root
+    echo "Installation target required. Set DEVSTACK_TARGET" && exit 1
   fi
 else
   echo "$DEVSTACK_TARGET" > .target

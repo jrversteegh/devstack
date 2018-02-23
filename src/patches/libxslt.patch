@@ -1,0 +1,13 @@
+--- configure	2016-05-24 03:49:13.000000000 +0200
++++ configure.patched	2018-02-23 23:18:26.073760366 +0100
+@@ -14189,8 +14189,8 @@
+         echo "PYTHON is pointing at $PYTHON"
+         PYTHON_VERSION=`$PYTHON -c "import sys; print sys.version[0:3]"`
+ 	echo Found Python version $PYTHON_VERSION
+-	LIBXML2_PYTHON=`$PYTHON -c "try : import libxml2 ; print 1
+-except: print 0"`
++    LIBXML2_PYTHON=`$PYTHON -c "try : import libxml2 ; print(1)
++except: print(0)"`
+ 	if test "$LIBXML2_PYTHON" = "1"
+ 	then
+ 	    echo Found libxml2-python module
