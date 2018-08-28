@@ -1,0 +1,511 @@
+cmake_minimum_required(VERSION 2.8)
+
+# Author: Jaap Versteegh <j.r.versteegh@gmail.com>
+
+# Create external projects for contributions
+include(ExternalProject)
+include(CheckIncludeFiles)
+include(CheckCSourceCompiles)
+
+set(PRE_FLAGS --prefix=${CMAKE_INSTALL_PREFIX})
+set(GO_FLAGS ${PRE_FLAGS} --disable-gtk-doc-html)
+set(GNU_MIRROR http://mirror.inode.at/gnu/)
+set(BOOST_CFLAGS -I${CMAKE_INSTALL_PREFIX}/include)
+set(BOOST_CXXFLAGS -I${CMAKE_INSTALL_PREFIX}/include)
+set(BOOST_LDFLAGS -L${CMAKE_INSTALL_PREFIX}/lib)
+set(CMAKE_FLAGS -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=gcc -D CMAKE_CXX_COMPILER=g++) 
+
+check_include_files(CL/opencl.h HAVE_OPENCL_INC)
+check_include_files(GL/gl.h HAVE_OPENGL_INC)
+check_include_files(GLES2/gl2.h HAVE_GLES2_INC)
+check_include_files(readline/readline.h HAVE_READ_LINE)
+check_c_source_compiles(
+"
+#include <X11/Xlib.h>
+#include <X11/extensions/XShm.h>
+#include <X11/extensions/XInput2.h>
+#include <X11/extensions/Xrandr.h>
+int main() { return 0;}
+" 
+HAVE_X_INC
+)
+
+if (HAVE_OPENGL_INC) 
+  set(CMAKE_REQUIRED_LIBRARIES "-lGL")
+  check_c_source_compiles("#include <GL/gl.h>
+  int main() { return 0; }
+  " 
+  HAVE_OPENGL_LIB
+  )
+  set(CMAKE_REQUIRED_LIBRARIES "")
+endif()
+
+if(HAVE_OPENGL_INC) 
+  if(NOT HAVE_OPENGL_LIB) 
+    message(FATAL_ERROR "Have OpenGL headers, but can't use -lGL")
+  endif()
+endif()
+
+# Handle having X headers or not
+if(NOT HAVE_X_INC)
+  message(FATAL_ERROR "X11 header files are required")
+endif()
+
+# Have opencl for gdal ?
+if(HAVE_OPENCL_INC)
+  message( "OpenCL headers found. Enabling for libgdal")
+  set(OPENCL_FLAGS --with-opencl)
+else()
+  message( "No OpenCL headers found.")
+  set(OPENCL_FLAGS "")
+endif()
+
+# OpenGL (ES) headers for cairo, qt and webkitgtk
+if(HAVE_GLES2_INC)
+  set(CAIRO_GL_FLAGS --enable-glesv2=yes)
+  set(QT_GL_FLAGS -opengl es2)
+  set(WEBKITGKT_GL_FLAGS -D ENABLE_OPENGL=1)
+elseif(HAVE_OPENGL_INC)
+  set(CAIRO_GL_FLAGS --enable-gl=yes)
+  set(QT_GL_FLAGS -opengl desktop)
+  set(WEBKITGKT_GL_FLAGS -D ENABLE_OPENGL=1)
+else()
+  set(CAIRO_GL_FLAGS "")
+  set(QT_GL_FLAGS "")
+  set(WEBKITGKT_GL_FLAGS -D ENABLE_OPENGL=0)
+endif()
+
+if(HAVE_READ_LINE)
+  set(PG_READ_LINE_FLAGS --with-readline)
+else()
+  set(PG_READ_LINE_FLAGS --without-readline)
+endif()
+
+# First build gcc 
+ExternalProject_Add(
+  gmp
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gmp
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  mpfr
+  DEPENDS gmp
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mpfr
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-gmp=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  mpc
+  DEPENDS mpfr
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mpc
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-gmp=${CMAKE_INSTALL_PREFIX} --with-mpfr=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  gcc
+  DEPENDS mpc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gcc
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gcc/configure ${PRE_FLAGS} --disable-multilib --enable-ld
+--enable-gold --enable-lto --with-gmp=${CMAKE_INSTALL_PREFIX} --with-mpfr=${CMAKE_INSTALL_PREFIX} --with-mpc=${CMAKE_INSTALL_PREFIX}
+
+)
+
+ExternalProject_Add_Step(
+  gcc
+  after_install
+  DEPENDEES install
+  COMMAND cd ${CMAKE_INSTALL_PREFIX}/bin && ln -sf gcc cc
+)
+
+ExternalProject_Add(
+  perl
+  DEPENDS gcc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/perl
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./Configure -des -Dprefix=${CMAKE_INSTALL_PREFIX} -Dusethreads -Duseshrplib
+)
+
+ExternalProject_Add_Step(
+  perl
+  after_install
+  DEPENDEES install
+  COMMAND cd ${CMAKE_INSTALL_PREFIX}/lib && ln -sf perl5/5.24.0/x86_64-linux/CORE/libperl.so .
+)
+
+ExternalProject_Add(
+  texinfo
+  DEPENDS perl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/texinfo
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/texinfo/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  gdb
+  DEPENDS texinfo
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdb
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gdb/configure ${PRE_FLAGS}
+)
+
+# Then autotools
+
+ExternalProject_Add(
+  autoconf
+  DEPENDS gdb
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autoconf
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/autoconf/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  automake
+  DEPENDS autoconf
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/automake
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/automake/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  libtool
+  DEPENDS automake
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libtool
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libtool/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  libunistring
+  DEPENDS libtool
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libunistring
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libunistring/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  libatomic_ops
+  DEPENDS libtool
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libatomic_ops
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libatomic_ops/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  gc
+  DEPENDS libatomic_ops libunistring
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gc
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gc/configure ${PRE_FLAGS}
+)
+
+
+# Some libraries first that don't depend on anything else
+
+ExternalProject_Add(
+  zlib
+  DEPENDS gc
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  openssl
+  DEPENDS zlib
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openssl
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/Configure ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib --openssldir=${CMAKE_INSTALL_PREFIX}/etc/ssl linux-x86_64
+  BUILD_COMMAND make depend && make
+  # Don't install. That fails for some weird reason. We'll do that explicitly
+  INSTALL_COMMAND ""
+)
+
+ExternalProject_Add(
+  llvm
+  DEPENDS openssl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/llvm
+  CMAKE_ARGS ${CMAKE_FLAGS} -G "Unix Makefiles" 
+)
+
+ExternalProject_Add(
+  libffi
+  DEPENDS openssl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libffi
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libffi/configure ${PRE_FLAGS} 
+)
+
+ExternalProject_Add(
+  bzip2
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bzip2
+  BUILD_IN_SOURCE 1
+  # Arcane build procedure for bzip2...
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND $(MAKE) && $(MAKE) -f Makefile-libbz2_so
+  INSTALL_COMMAND $(MAKE) PREFIX=${CMAKE_INSTALL_PREFIX} install
+)
+
+ExternalProject_Add(
+  pcre
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pcre
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pcre/configure ${PRE_FLAGS} --enable-unicode-properties --enable-jit --enable-pcre16 --enable-pcre32
+)
+
+ExternalProject_Add(
+  guile
+  DEPENDS gc libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/guile
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  autogen
+  DEPENDS guile
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/autogen
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  gperf
+  DEPENDS autogen
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gperf
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  expat
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/expat
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/expat/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  libpng
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libpng
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libpng/configure ${PRE_FLAGS} 
+  BUILD_COMMAND $(MAKE) INCLUDES=-I${CMAKE_INSTALL_PREFIX}/include
+)
+
+ExternalProject_Add(
+  jpeg
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/jpeg
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --enable-shared
+)
+
+ExternalProject_Add(
+  json-c
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/json-c
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/json-c/configure ${PRE_FLAGS} 
+)
+
+ExternalProject_Add(
+  icu
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/icu/source
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/icu/source/configure ${PRE_FLAGS} 
+)
+
+ExternalProject_Add(
+  fam
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fam
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  BUILD_COMMAND ${MAKE}
+  INSTALL_COMMAND $(MAKE) install install-data
+)
+
+
+ExternalProject_Add(
+  OpenBLAS
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/OpenBLAS
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ""
+  INSTALL_COMMAND $(MAKE) PREFIX=${CMAKE_INSTALL_PREFIX} install 
+)
+
+ExternalProject_Add_Step(
+  OpenBLAS
+  after_install
+  DEPENDEES install
+  COMMAND cd ${CMAKE_INSTALL_PREFIX}/lib && ln -sf libopenblas.so libblas.so && ln -sf libopenblas.so liblapack.so && ln -sf libopenblas.so libatlas.so
+)
+
+
+ExternalProject_Add(
+  tcl
+  DEPENDS libffi 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tcl
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tcl/unix/configure ${PRE_FLAGS} --enable-64bit
+)
+
+ExternalProject_Add(
+  tk
+  DEPENDS tcl 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tk
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tk/unix/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  Python
+  DEPENDS tk 
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Python
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared --with-ensurepip --with-gcc=${CMAKE_INSTALL_PREFIX}/bin/gcc
+)
+
+ExternalProject_Add_Step(
+  Python
+  after_install
+  DEPENDEES install
+  COMMAND cd ${CMAKE_INSTALL_PREFIX}/bin && ln -sf python3 python && ln -sf python3-config python-config && ln -sf pip3 pip
+)
+
+ExternalProject_Add(
+  xz
+  DEPENDS Python
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/xz
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/xz/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  tiff
+  DEPENDS xz
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tiff
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tiff/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  libxml2
+  DEPENDS xz icu
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libxml2
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libxml2/configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX} --with-icu --with-xpath 
+  INSTALL_COMMAND $(MAKE) install
+)
+
+ExternalProject_Add(
+  libxslt
+  DEPENDS libxml2
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libxslt
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libxslt/configure ${PRE_FLAGS}
+  INSTALL_COMMAND $(MAKE) install 
+)
+
+ExternalProject_Add(
+  sqlite
+  DEPENDS libxml2
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sqlite
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/sqlite/configure ${PRE_FLAGS} CFLAGS=-DSQLITE_ENABLE_COLUMN_METADATA
+)
+
+
+ExternalProject_Add(
+  openmpi
+  DEPENDS Python
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openmpi
+  # Disable vt because of compile error in combination with cuda
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openmpi/configure ${PRE_FLAGS} --enable-cxx-exceptions --disable-vt
+)
+
+ExternalProject_Add(
+  boost
+  DEPENDS openmpi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/boost
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./bootstrap.sh ${PRE_FLAGS} --with-icu=${CMAKE_INSTALL_PREFIX}
+  # Force boost to link to the right libbstdc++ etc
+  BUILD_COMMAND ./b2 -q stage variant=release link=shared runtime-link=shared threading=multi cxxflags=${BOOST_CXXFLAGS} cflags=${BOOST_CFLAGS} linkflags=${BOOST_LDFLAGS}
+  INSTALL_COMMAND ./b2 -q install variant=release link=shared runtime-link=shared threading=multi cxxflags=${BOOST_CXXFLAGS} cflags=${BOOST_CFLAGS} linkflags=${BOOST_LDFLAGS}
+)
+
+ExternalProject_Add(
+  libarchive
+  DEPENDS libxml2
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libarchive
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libarchive/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  nettle
+  DEPENDS libarchive
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/nettle
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/nettle/configure ${PRE_FLAGS} --disable-static
+)
+
+ExternalProject_Add(
+  gnutls
+  DEPENDS nettle
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gnutls
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-default-trust-store-file=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt --with-included-libtasn1 --without-p11-kit --with-guile-site-dir=${CMAKE_INSTALL_PREFIX}
+)
+
+ExternalProject_Add(
+  curl
+  DEPENDS gnutls
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/curl
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/curl/configure ${PRE_FLAGS} --enable-http --enable-ftp --enable-file --with-ssl=${CMAKE_INSTALL_PREFIX} --with-ca-path=${CMAKE_INSTALL_PREFIX}/etc/ssl/certs --with-ca-bundle=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt
+)
+
+ExternalProject_Add(
+  wget
+  DEPENDS curl
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/wget
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/wget/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add_Step(
+  wget
+  after_install
+  DEPENDEES install
+  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/certs_install
+)
+
+ExternalProject_Add(
+  cmake
+  DEPENDS wget
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS} --system-libs --no-system-libuv
+  INSTALL_COMMAND ""
+)
+
+ExternalProject_Add(
+  bison
+  DEPENDS Python
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bison
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/bison/configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  flex
+  DEPENDS bison
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flex
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/flex/configure ${PRE_FLAGS}
+)
+
+
+ExternalProject_Add(
+  swig
+  DEPENDS Python pcre
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/swig
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/swig/configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX}/bin/python
+)
+
+ExternalProject_Add(
+  cppunit
+  DEPENDS Python
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cppunit
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cppunit/configure ${PRE_FLAGS} 
+)
+
+ExternalProject_Add(
+  gettext
+  DEPENDS libxml2 bzip2
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gettext
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gettext/configure ${PRE_FLAGS} 
+)
+

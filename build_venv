@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Author: Jaap Versteegh <j.r.versteegh@gmail.com>
+
+if [ -z $CORES ]; then
+  CORES=6
+fi
+
+function fail()
+{
+  msg=$1
+  echo $msg >&2
+  exit 1
+}
+
+function test_available()
+{
+  prog=$1
+  which $prog >/dev/null || fail "$prog is required for building devstack"
+}
+
+curfile=`readlink -f $BASH_SOURCE`
+curdir=`dirname $curfile`
+cd $curdir
+
+if [ -z "$DEVSTACK_TARGET" ]; then
+  if [ -f .target ]; then
+    DEVSTACK_TARGET=`cat .target`
+  else
+    echo "Installation target required. Set DEVSTACK_TARGET" && exit 1
+  fi
+else
+  echo "$DEVSTACK_TARGET" > .target
+fi
+export DEVSTACK_TARGET
+if [ ! -f $DEVSTACK_TARGET/bin/activate ]; then
+  echo "Expected DEVSTACK_TARGET to be a virtualenv" && exit 1
+fi
+echo "Building to: $DEVSTACK_TARGET"
+
+scripts/install_prerequisites
+test_available gzip
+test_available bzip2
+test_available xz
+test_available wget
+test_available m4
+test_available g++
+
+pushd src >/dev/null
+echo -n "Downloading... "
+./download_venv >../download_venv.log 2>&1 || fail "Failed to download/unpack some sources"
+echo "done."
+popd >/dev/null
+
+if [ ! `grep BOOSTROOT $DEVSTACK_TARGET/bin/activate >/dev/null` ]; then
+  cat venv.sh >> $DEVSTACK_TARGET/bin/activate
+  # Will replace python
+  rm -f $DEVSTACK_TARGET/bin/python
+  rm -f $DEVSTACK_TARGET/bin/pip
+  rm -f $DEVSTACK_TARGET/bin/python-config
+  rm -f $DEVSTACK_TARGET/bin/wheel
+  rm -f $DEVSTACK_TARGET/bin/easy_install
+fi
+source $DEVSTACK_TARGET/bin/activate
+
+test_available cmake
+
+cp -f src/CMakeLists_venv.txt src/CMakeLists.txt
+
+mkdir -p .build_venv
+pushd "$DEVSTACK_TARGET" >/dev/null && ln -sf lib lib64 && popd >/dev/null
+
+pushd .build_venv >/dev/null
+echo -n "Running cmake stage 1... "
+cmake ../src -DCMAKE_INSTALL_PREFIX="$DEVSTACK_TARGET" >../build_venv.log 2>&1 || fail "Failed to run cmake: stage 1"
+echo "done."
+echo -n "Running make openssl... "
+make -j $CORES  openssl >>../build_venv.log 2>&1 || fail "Failed to complete make openssl: stage 1"
+pushd ../src/openssl >/dev/null && make install >>../../build_venv.log 2>&1 && popd >/dev/null
+echo "done."
+echo -n "Running make flex... "
+make -j $CORES flex >>../build_venv.log 2>&1 || fail "Failed to complete make: stage 1"
+echo "done."
+echo -n "Running make cmake... "
+make -j $CORES cmake  >>../build_venv.log 2>&1 || fail "Failed to complete make"
+pushd cmake-prefix/src/cmake-build >/dev/null && make install >>../../../../build_venv.log 2>&1 && popd >/dev/null
+make -j $CORES boost  >>../build_venv.log 2>&1 || fail "Failed to complete boost"
+make -j $CORES sqlite  >>../build_venv.log 2>&1 || fail "Failed to complete sqlite"
+echo "done."
