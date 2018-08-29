@@ -4,3 +4,4 @@
 /download.log
 /root
 /.target
+/src/CMakeLists.txt

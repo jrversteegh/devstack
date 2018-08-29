@@ -469,7 +469,7 @@ ExternalProject_Add(
   cmake
   DEPENDS wget
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS} --system-libs --no-system-libuv
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure ${PRE_FLAGS} --system-libs --no-system-libuv --no-system-librhash
   INSTALL_COMMAND ""
 )
 

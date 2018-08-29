@@ -55,7 +55,7 @@ source env.sh
 
 test_available cmake
 
-cp -f src/CMakeLists_full.txt src/CMakeLists.txt
+cp -af src/CMakeLists_full.txt src/CMakeLists.txt
 
 if [ ! -x "$DEVSTACK_TARGET/bin/cmake" ]; then
   # Create preliminary build with host tools

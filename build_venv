@@ -65,7 +65,7 @@ source $DEVSTACK_TARGET/bin/activate
 
 test_available cmake
 
-cp -f src/CMakeLists_venv.txt src/CMakeLists.txt
+cp -af src/CMakeLists_venv.txt src/CMakeLists.txt
 
 mkdir -p .build_venv
 pushd "$DEVSTACK_TARGET" >/dev/null && ln -sf lib lib64 && popd >/dev/null
@@ -84,6 +84,8 @@ echo "done."
 echo -n "Running make cmake... "
 make -j $CORES cmake  >>../build_venv.log 2>&1 || fail "Failed to complete make"
 pushd cmake-prefix/src/cmake-build >/dev/null && make install >>../../../../build_venv.log 2>&1 && popd >/dev/null
+echo -n "Running make boost... "
 make -j $CORES boost  >>../build_venv.log 2>&1 || fail "Failed to complete boost"
+echo -n "Running make sqlite... "
 make -j $CORES sqlite  >>../build_venv.log 2>&1 || fail "Failed to complete sqlite"
 echo "done."
