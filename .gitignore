@@ -1,4 +1,5 @@
 /.build
+/.build_venv
 /build-1.log
 /build-2.log
 /download.log
