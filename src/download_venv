@@ -132,7 +132,7 @@ gnu_download mpc 1.1.0 tar.gz
 gnu_download gcc 8.2.0 tar.gz gcc-8.2.0
 url_download perl http://www.cpan.org/src/5.0/perl-5.26.0.tar.gz
 gnu_download texinfo 6.1 tar.xz
-gnu_download gdb 7.11.1 tar.xz
+gnu_download gdb 8.2 tar.xz
 gnu_download libtool 2.4.6 tar.xz 
 gnu_download libunistring 0.9.6 tar.xz
 url_download libatomic_ops http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.6.2.tar.gz
