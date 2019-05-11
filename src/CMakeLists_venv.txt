@@ -552,3 +552,11 @@ ExternalProject_Add(
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CGAL
   CMAKE_ARGS ${CMAKE_FLAGS}
 )
+
+ExternalProject_Add(
+  eigen
+  # Doesn't really depend, just for easy building
+  DEPENDS GeographicLib proj gdal
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/eigen
+  CMAKE_ARGS ${CMAKE_FLAGS}
+)
