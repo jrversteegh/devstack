@@ -560,3 +560,18 @@ ExternalProject_Add(
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/eigen
   CMAKE_ARGS ${CMAKE_FLAGS}
 )
+
+ExternalProject_Add(
+  fftw
+  # Doesn't really depend, just for easy building
+  DEPENDS GeographicLib proj gdal
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
+  fftwpp
+  DEPENDS fftw
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw++
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)

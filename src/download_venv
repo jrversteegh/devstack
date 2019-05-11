@@ -3,7 +3,7 @@
 # Author: Jaap Versteegh <j.r.versteegh@gmail.com>
 
 GNU_MIRROR=http://ftp.snt.utwente.nl/pub/software/gnu
-SF_HOST=http://prdownloads.sourceforge.net
+SF_HOST=http://download.sourceforge.net
 GNM_HOST=https://download.gnome.org/sources
 FD_HOST=https://www.freedesktop.org/software
 
@@ -77,7 +77,11 @@ function gnu_download()
 function sf_download()
 {
   name=$1
-  dname=${1,,}
+  if [ -z $4 ]; then
+    dname=${1,,}
+  else
+    dname=$4
+  fi
   version=$2
   ext=$3
   file=$name-$version.$ext
@@ -152,8 +156,8 @@ url_download zlib http://zlib.net/zlib-1.2.11.tar.gz
 url_download bzip2 http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 url_download libffi ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz
 url_download pcre ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.40.tar.gz
-sf_download expat 2.1.1 tar.bz2
-sf_download libpng 1.6.22 tar.xz
+url_download expat https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-2.2.6.tar.bz2
+sf_download libpng 1.6.37 tar.xz
 url_download jpeg http://tenet.dl.sourceforge.net/project/libjpeg/libjpeg/6b/jpegsrc.v6b.tar.gz
 url_download icu http://download.icu-project.org/files/icu4c/62.1/icu4c-62_1-src.tgz
 url_download json-c https://s3.amazonaws.com/json-c_releases/releases/json-c-0.13.1.tar.gz
@@ -194,3 +198,5 @@ sf_download GeographicLib 1.49 tar.gz distrib
 
 url_download CGAL https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.14/CGAL-4.14.tar.xz
 url_download eigen http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
+url_download fftw http://www.fftw.org/fftw-3.3.8.tar.gz
+sf_download fftw++ 2.05 tar.gz fftwpp
