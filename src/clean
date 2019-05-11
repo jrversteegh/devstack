@@ -38,6 +38,7 @@ rm -rf bison
 rm -rf boost
 rm -rf bzip2
 rm -rf cairo
+rm -rf CGAL
 rm -rf cmake
 rm -rf cppunit
 rm -rf curl
@@ -48,8 +49,11 @@ rm -rf fontconfig
 rm -rf freetype
 rm -rf gc
 rm -rf gcc
+rm -rf gdal
 rm -rf gdb
 rm -rf gdk-pixbuf
+rm -rf geos
+rm -rf GeographicLib
 rm -rf gettext
 rm -rf glib
 rm -rf gmp
@@ -58,6 +62,7 @@ rm -rf gtk+
 rm -rf guile
 rm -rf harfbuzz
 rm -rf icu
+rm -rf jasper
 rm -rf jpeg
 rm -rf json-c
 rm -rf libarchive
@@ -68,6 +73,7 @@ rm -rf libtool
 rm -rf libunistring
 rm -rf libxml2
 rm -rf libxslt
+rm -rf llvm
 rm -rf mpc
 rm -rf mpfr
 rm -rf OpenBLAS
@@ -77,6 +83,9 @@ rm -rf pango
 rm -rf pcre
 rm -rf perl
 rm -rf pixman
+rm -rf postgis
+rm -rf postgresql
+rm -rf proj
 rm -rf pygobject
 rm -rf Python
 rm -rf swig
@@ -104,6 +113,7 @@ rm -rf nettle
 rm -rf ruby
 rm -rf vala
 rm -rf webkitgtk
+rm -rf sqlite
 rm -rf tcl
 rm -rf tk
 

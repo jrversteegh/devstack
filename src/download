@@ -226,12 +226,12 @@ git_download qtwebkit git://code.qt.io/qt/qtwebkit.git 5.9
 git_download flexx https://github.com/jrversteegh/flexx.git master
 git_download matplotlib https://github.com/jrversteegh/matplotlib.git master
 
-url_download geos http://download.osgeo.org/geos/geos-3.6.1.tar.bz2
-url_download proj http://download.osgeo.org/proj/proj-4.9.3.tar.gz
+url_download geos http://download.osgeo.org/geos/geos-3.7.0.tar.bz2
+url_download proj http://download.osgeo.org/proj/proj-5.2.0.tar.gz
 url_download jasper http://www.ece.uvic.ca/~frodo/jasper/software/jasper-2.0.12.tar.gz
-url_download gdal http://download.osgeo.org/gdal/2.1.2/gdal-2.1.2.tar.xz
+url_download gdal http://download.osgeo.org/gdal/2.3.2/gdal-2.3.2.tar.xz
 
-url_download CGAL https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.9/CGAL-4.9.tar.xz
-sf_download GeographicLib 1.48 tar.gz distrib
+url_download CGAL https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.13/CGAL-4.13.tar.xz
+sf_download GeographicLib 1.49 tar.gz distrib
 url_download postgis http://download.osgeo.org/postgis/source/postgis-2.3.1.tar.gz
 url_download mapnik https://github.com/mapnik/mapnik/releases/download/v3.0.12/mapnik-v3.0.12.tar.bz2

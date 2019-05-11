@@ -185,3 +185,11 @@ url_download tiff http://download.osgeo.org/libtiff/tiff-4.0.6.tar.gz
 gnu_download nettle 3.2 tar.gz
 url_download gnutls ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/gnutls-3.5.1.tar.xz
 gnu_download wget 1.18 tar.xz
+
+url_download geos http://download.osgeo.org/geos/geos-3.7.0.tar.bz2
+url_download proj http://download.osgeo.org/proj/proj-5.2.0.tar.gz
+url_download jasper http://www.ece.uvic.ca/~frodo/jasper/software/jasper-2.0.12.tar.gz
+url_download gdal http://download.osgeo.org/gdal/2.3.2/gdal-2.3.2.tar.xz
+
+url_download CGAL https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.13/CGAL-4.13.tar.xz
+sf_download GeographicLib 1.49 tar.gz distrib
