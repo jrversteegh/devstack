@@ -142,7 +142,7 @@ gnu_download libunistring 0.9.6 tar.xz
 url_download libatomic_ops http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.6.2.tar.gz
 url_download gc http://www.hboehm.info/gc/gc_source/gc-7.6.4.tar.gz
 gnu_download guile 2.2.4 tar.xz
-gnu_download autogen 5.18.9 tar.xz rel5.18.9
+gnu_download autogen 5.18.16 tar.xz rel5.18.16
 gnu_download autoconf 2.69 tar.xz 
 gnu_download automake 1.15 tar.xz
 gnu_download gperf 3.1 tar.gz
@@ -187,7 +187,7 @@ url_download tk http://prdownloads.sourceforge.net/tcl/tk8.6.6-src.tar.gz
 url_download sqlite https://sqlite.org/2016/sqlite-autoconf-3140200.tar.gz
 url_download tiff http://download.osgeo.org/libtiff/tiff-4.0.6.tar.gz
 
-gnu_download nettle 3.2 tar.gz
+gnu_download nettle 3.4.1 tar.gz
 url_download gnutls ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.7.tar.xz
 gnu_download wget 1.18 tar.xz
 

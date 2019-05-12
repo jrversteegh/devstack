@@ -438,10 +438,10 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   gnutls
-  DEPENDS nettle
+  DEPENDS nettle guile
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gnutls
   BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-default-trust-store-file=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt --with-included-libtasn1 --without-p11-kit --with-guile-site-dir=${CMAKE_INSTALL_PREFIX}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-default-trust-store-file=${CMAKE_INSTALL_PREFIX}/etc/ssl/ca-bundle.crt --with-included-libtasn1 --without-p11-kit --enable-guile
 )
 
 ExternalProject_Add(
@@ -556,7 +556,8 @@ ExternalProject_Add(
 ExternalProject_Add(
   eigen
   # Doesn't really depend, just for easy building
-  DEPENDS GeographicLib proj gdal
+  DEPENDS CGAL
+
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/eigen
   CMAKE_ARGS ${CMAKE_FLAGS}
 )
@@ -564,14 +565,14 @@ ExternalProject_Add(
 ExternalProject_Add(
   fftw
   # Doesn't really depend, just for easy building
-  DEPENDS GeographicLib proj gdal
+  DEPENDS eigen
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --enable-threads --enable-openmp --enable-sse2 --enable-avx512
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fftw/configure ${PRE_FLAGS} --enable-threads --enable-openmp --enable-sse2 --enable-avx512
 )
 
 ExternalProject_Add(
   fftwpp
   DEPENDS fftw
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw++
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fftw++/configure ${PRE_FLAGS}
 )
