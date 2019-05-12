@@ -42,8 +42,11 @@ rm -rf CGAL
 rm -rf cmake
 rm -rf cppunit
 rm -rf curl
+rm -rf eigen
 rm -rf expat
 rm -rf fam
+rm -rf fftw
+rm -rf fftw++
 rm -rf flex
 rm -rf fontconfig
 rm -rf freetype
