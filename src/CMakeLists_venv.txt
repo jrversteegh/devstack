@@ -566,7 +566,7 @@ ExternalProject_Add(
   # Doesn't really depend, just for easy building
   DEPENDS GeographicLib proj gdal
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw
-  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --enable-threads --enable-openmp --enable-sse2 --enable-avx512
 )
 
 ExternalProject_Add(
