@@ -162,7 +162,7 @@ url_download jpeg http://tenet.dl.sourceforge.net/project/libjpeg/libjpeg/6b/jpe
 url_download icu http://download.icu-project.org/files/icu4c/62.1/icu4c-62_1-src.tgz
 url_download json-c https://s3.amazonaws.com/json-c_releases/releases/json-c-0.13.1.tar.gz
 url_download OpenBLAS http://github.com/xianyi/OpenBLAS/archive/v0.3.2.tar.gz
-url_download fam ftp://oss.sgi.com/projects/fam/download/stable/fam-2.7.0.tar.gz 
+sf_download fam 2.7.0 tar.gz fam-mirror
 chmod -R u+w fam
 url_download openssl https://www.openssl.org/source/openssl-1.0.2p.tar.gz
 url_download Python https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
@@ -194,7 +194,7 @@ url_download geos http://download.osgeo.org/geos/geos-3.7.0.tar.bz2
 url_download proj http://download.osgeo.org/proj/proj-5.2.0.tar.gz
 url_download jasper http://www.ece.uvic.ca/~frodo/jasper/software/jasper-2.0.12.tar.gz
 url_download gdal http://download.osgeo.org/gdal/2.3.2/gdal-2.3.2.tar.xz
-sf_download GeographicLib 1.49 tar.gz distrib
+sf_download GeographicLib 1.49 tar.gz
 
 url_download CGAL https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.14/CGAL-4.14.tar.xz
 url_download eigen http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
