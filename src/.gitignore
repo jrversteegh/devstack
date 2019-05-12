@@ -92,3 +92,6 @@
 /matplotlib
 /llvm
 /jasper
+/eigen
+/fftw++
+/fftw
