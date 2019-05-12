@@ -3,7 +3,7 @@
 # Author: Jaap Versteegh <j.r.versteegh@gmail.com>
 
 GNU_MIRROR=http://ftp.snt.utwente.nl/pub/software/gnu
-SF_HOST=http://download.sourceforge.net
+SF_HOST=http://prdownloads.sourceforge.net
 GNM_HOST=https://download.gnome.org/sources
 FD_HOST=https://www.freedesktop.org/software
 
@@ -154,7 +154,7 @@ url_download llvm/projects/libcxxabi http://releases.llvm.org/$llvm_version/libc
 url_download llvm/projects/openmp http://releases.llvm.org/$llvm_version/openmp-$llvm_version.src.tar.xz
 
 url_download zlib http://zlib.net/zlib-1.2.11.tar.gz
-url_download bzip2 http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
+sf_download bzip2 1.0.6 tar.gz
 url_download libffi ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz
 url_download pcre ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.40.tar.gz
 url_download expat https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-2.2.6.tar.bz2
