@@ -146,11 +146,12 @@ gnu_download autogen 5.18.9 tar.xz rel5.18.9
 gnu_download autoconf 2.69 tar.xz 
 gnu_download automake 1.15 tar.xz
 gnu_download gperf 3.1 tar.gz
-url_download llvm http://releases.llvm.org/6.0.1/llvm-6.0.1.src.tar.xz
-url_download llvm/tools/clang http://releases.llvm.org/6.0.1/cfe-6.0.1.src.tar.xz
-url_download llvm/projects/libcxx http://releases.llvm.org/6.0.1/libcxx-6.0.1.src.tar.xz
-url_download llvm/projects/libcxxabi http://releases.llvm.org/6.0.1/libcxxabi-6.0.1.src.tar.xz
-url_download llvm/projects/openmp http://releases.llvm.org/6.0.1/openmp-6.0.1.src.tar.xz
+llvm_version=8.0.0
+url_download llvm http://releases.llvm.org/$llvm_version/llvm-$llvm_version.src.tar.xz
+url_download llvm/tools/clang http://releases.llvm.org/$llvm_version/cfe-$llvm_version.src.tar.xz
+url_download llvm/projects/libcxx http://releases.llvm.org/$llvm_version/libcxx-$llvm_version.src.tar.xz
+url_download llvm/projects/libcxxabi http://releases.llvm.org/$llvm_version/libcxxabi-$llvm_version.src.tar.xz
+url_download llvm/projects/openmp http://releases.llvm.org/$llvm_version/openmp-$llvm_version.src.tar.xz
 
 url_download zlib http://zlib.net/zlib-1.2.11.tar.gz
 url_download bzip2 http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
@@ -164,12 +165,12 @@ url_download json-c https://s3.amazonaws.com/json-c_releases/releases/json-c-0.1
 url_download OpenBLAS http://github.com/xianyi/OpenBLAS/archive/v0.3.2.tar.gz
 sf_download fam 2.7.0 tar.gz fam-mirror
 chmod -R u+w fam
-url_download openssl https://www.openssl.org/source/openssl-1.0.2p.tar.gz
+url_download openssl https://www.openssl.org/source/openssl-1.0.2r.tar.gz
 url_download Python https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
 url_download xz http://tukaani.org/xz/xz-5.2.4.tar.xz
 url_download libxml2 ftp://xmlsoft.org/libxml2/libxml2-2.9.7.tar.gz
 url_download libxslt ftp://xmlsoft.org/libxml2/libxslt-1.1.32.tar.gz
-url_download openmpi https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.2.tar.bz2
+url_download openmpi https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.bz2
 url_download boost http://prdownloads.sourceforge.net/boost/boost_1_70_0.tar.bz2
 if [ -d boost_1_70_0 ]; then mv boost_* boost; fi
 url_download libarchive http://libarchive.org/downloads/libarchive-3.2.2.tar.gz
@@ -179,7 +180,7 @@ gnu_download gettext 0.19.7 tar.xz
 gnu_download bison 3.0.4 tar.xz
 sf_download flex 2.6.0 tar.xz
 sf_download cppunit 1.12.1 tar.gz
-sf_download swig 3.0.8 tar.gz
+sf_download swig 4.0.0 tar.gz
 sf_download freetype 2.6.3 tar.gz
 url_download tcl http://prdownloads.sourceforge.net/tcl/tcl8.6.6-src.tar.gz
 url_download tk http://prdownloads.sourceforge.net/tcl/tk8.6.6-src.tar.gz
@@ -187,13 +188,13 @@ url_download sqlite https://sqlite.org/2016/sqlite-autoconf-3140200.tar.gz
 url_download tiff http://download.osgeo.org/libtiff/tiff-4.0.6.tar.gz
 
 gnu_download nettle 3.2 tar.gz
-url_download gnutls ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/gnutls-3.5.1.tar.xz
+url_download gnutls ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.7.tar.xz
 gnu_download wget 1.18 tar.xz
 
-url_download geos http://download.osgeo.org/geos/geos-3.7.0.tar.bz2
-url_download proj http://download.osgeo.org/proj/proj-5.2.0.tar.gz
+url_download geos http://download.osgeo.org/geos/geos-3.7.2.tar.bz2
+url_download proj http://download.osgeo.org/proj/proj-6.0.0.tar.gz
 url_download jasper http://www.ece.uvic.ca/~frodo/jasper/software/jasper-2.0.12.tar.gz
-url_download gdal http://download.osgeo.org/gdal/2.3.2/gdal-2.3.2.tar.xz
+url_download gdal http://download.osgeo.org/gdal/3.0.0/gdal-3.0.0.tar.xz
 sf_download GeographicLib 1.49 tar.gz
 
 url_download CGAL https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.14/CGAL-4.14.tar.xz
