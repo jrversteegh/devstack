@@ -1,0 +1,32 @@
+--- configure.old	2019-05-13 13:39:30.184926754 +0200
++++ configure	2019-05-13 13:40:57.729138017 +0200
+@@ -14197,7 +14197,7 @@
+ 		PKG_CONFIG=""
+ 	fi
+ fi
+-  _guile_versions_to_search="2.0 1.8"
++  _guile_versions_to_search="2.2 2.0 1.8"
+   if test -n "$GUILE_EFFECTIVE_VERSION"; then
+     _guile_tmp=""
+     for v in $_guile_versions_to_search; do
+--- agen5/guile-iface.h.old	2019-05-13 21:30:48.111585212 +0200
++++ agen5/guile-iface.h	2019-05-13 21:31:50.603394792 +0200
+@@ -9,7 +9,7 @@
+ # error AutoGen does not work with this version of Guile
+   choke me.
+ 
+-#elif GUILE_VERSION < 201000
++#else
+ # define AG_SCM_IS_PROC(_p)           scm_is_true( scm_procedure_p(_p))
+ # define AG_SCM_LIST_P(_l)            scm_is_true( scm_list_p(_l))
+ # define AG_SCM_PAIR_P(_p)            scm_is_true( scm_pair_p(_p))
+@@ -24,9 +24,6 @@
+ # define AG_SCM_TO_ULONG(_v)          ((unsigned long)scm_to_ulong(_v))
+ # define AG_SCM_VEC_P(_v)             scm_is_vector(_v)
+ 
+-#else
+-# error unknown GUILE_VERSION
+-  choke me.
+ #endif
+ 
+ #endif /* MUTATING_GUILE_IFACE_H_GUARD */
