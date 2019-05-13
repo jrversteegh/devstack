@@ -6,3 +6,5 @@
 /root
 /.target
 /src/CMakeLists.txt
+/build_venv.log
+/download_venv.log
