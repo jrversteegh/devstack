@@ -577,9 +577,10 @@ ExternalProject_Add(
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fftw/configure ${PRE_FLAGS} --enable-threads --enable-openmp --enable-sse2 --enable-avx512
 )
 
-ExternalProject_Add(
-  fftwpp
-  DEPENDS fftw
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw++
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fftw++/configure ${PRE_FLAGS}
-)
+# No installer for fftw++
+#ExternalProject_Add(
+#  fftwpp
+#  DEPENDS fftw
+#  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fftw++
+#  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fftw++/configure ${PRE_FLAGS}
+#)
