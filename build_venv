@@ -52,7 +52,8 @@ echo -n "Downloading... "
 echo "done."
 popd >/dev/null
 
-if [ ! `grep BOOSTROOT $DEVSTACK_TARGET/bin/activate >/dev/null` ]; then
+if ! grep BOOSTROOT $DEVSTACK_TARGET/bin/activate >/dev/null; then
+  echo "Appending devstack to environment"
   cat venv.sh >> $DEVSTACK_TARGET/bin/activate
   # Will replace python
   rm -f $DEVSTACK_TARGET/bin/python
