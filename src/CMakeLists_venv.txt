@@ -212,8 +212,7 @@ ExternalProject_Add(
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/openssl/Configure ${PRE_FLAGS} threads zlib-dynamic shared --libdir=lib --openssldir=${CMAKE_INSTALL_PREFIX}/etc/ssl linux-x86_64
   BUILD_COMMAND make depend && make
-  # Don't install. That fails for some weird reason. We'll do that explicitly
-  INSTALL_COMMAND ""
+  INSTALL_COMMAND make install_sw
 )
 
 ExternalProject_Add(
@@ -345,6 +344,14 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  mpdecimal
+  DEPENDS libffi
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mpdecimal
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ./configure ${PRE_FLAGS}
+)
+
+ExternalProject_Add(
   tk
   DEPENDS tcl 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tk
@@ -353,10 +360,10 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   Python
-  DEPENDS tk 
+  DEPENDS tk  expat libffi mpdecimal
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Python
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared --with-ensurepip --with-gcc=${CMAKE_INSTALL_PREFIX}/bin/gcc
-)
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Python/configure ${PRE_FLAGS} --enable-shared --with-ensurepip --with-gcc=${CMAKE_INSTALL_PREFIX}/bin/gcc --with-openssl=${CMAKE_INSTALL_PREFIX} --with-lto --with-system-ffi --with-system-libmpdec --enable-optimizations
+) 
 
 ExternalProject_Add_Step(
   Python
@@ -539,7 +546,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   gdal
-  DEPENDS geos pcre curl expat libpng jasper
+  DEPENDS proj pcre curl expat libpng jasper
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gdal
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./configure ${PRE_FLAGS} --with-python=${CMAKE_INSTALL_PREFIX}/bin/python ${OPENCL_FLAGS} --with-png=${CMAKE_INSTALL_PREFIX} --with-expat=${CMAKE_INSTALL_PREFIX} --with-libjson-c=${CMAKE_INSTALL_PREFIX} --with-curl=${CMAKE_INSTALL_PREFIX} --with-geos=yes --with-pcre LDFLAGS=$(LDFLAGS) --with-jasper=${CMAKE_INSTALL_PREFIX}

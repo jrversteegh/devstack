@@ -77,7 +77,7 @@ cmake ../src -DCMAKE_INSTALL_PREFIX="$DEVSTACK_TARGET" >../build_venv.log 2>&1 |
 echo "done."
 echo -n "Running make openssl... "
 make -j $CORES  openssl >>../build_venv.log 2>&1 || fail "Failed to complete make openssl: stage 1"
-pushd ../src/openssl >/dev/null && make install >>../../build_venv.log 2>&1 && popd >/dev/null
+#pushd ../src/openssl >/dev/null && make install >>../../build_venv.log 2>&1 && popd >/dev/null
 echo "done."
 echo -n "Running make flex... "
 make -j $CORES flex >>../build_venv.log 2>&1 || fail "Failed to complete make: stage 1"
