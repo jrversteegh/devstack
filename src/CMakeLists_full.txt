@@ -623,6 +623,17 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+  python_modules2
+  DEPENDS python_modules gtk+ postgresql
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/python_modules2
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ""
+  CMAKE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ./install.sh
+)
+
+ExternalProject_Add(
   pycairo
   DEPENDS Python cairo
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pycairo

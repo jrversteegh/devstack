@@ -373,6 +373,17 @@ ExternalProject_Add_Step(
 )
 
 ExternalProject_Add(
+  python_modules
+  DEPENDS Python
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/python_modules
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ""
+  CMAKE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ./install.sh
+)
+
+ExternalProject_Add(
   xz
   DEPENDS Python
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/xz
@@ -420,7 +431,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
   boost
-  DEPENDS openmpi
+  DEPENDS openmpi python_modules
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/boost
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ./bootstrap.sh ${PRE_FLAGS} --with-icu=${CMAKE_INSTALL_PREFIX}
